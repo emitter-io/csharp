@@ -248,37 +248,6 @@ namespace Emitter.Network
             get { return this.settings; }
         }
 
-#if !(WINDOWS_APP || WINDOWS_PHONE_APP) 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="brokerIpAddress">Broker IP address</param>
-        [Obsolete("Use this ctor MqttClient(string brokerHostName) insted")]
-        public MqttClient(IPAddress brokerIpAddress) :
-            this(brokerIpAddress, MqttSettings.MQTT_BROKER_DEFAULT_PORT, false, null, null, MqttSslProtocols.None)
-        {
-        }
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="brokerIpAddress">Broker IP address</param>
-        /// <param name="brokerPort">Broker port</param>
-        /// <param name="secure">Using secure connection</param>
-        /// <param name="caCert">CA certificate for secure connection</param>
-        /// <param name="clientCert">Client certificate</param>
-        /// <param name="sslProtocol">SSL/TLS protocol version</param>
-        [Obsolete("Use this ctor MqttClient(string brokerHostName, int brokerPort, bool secure, X509Certificate caCert) insted")]
-        public MqttClient(IPAddress brokerIpAddress, int brokerPort, bool secure, X509Certificate caCert, X509Certificate clientCert, MqttSslProtocols sslProtocol)
-        {
-#if !(MF_FRAMEWORK_VERSION_V4_2 || MF_FRAMEWORK_VERSION_V4_3 || COMPACT_FRAMEWORK)
-            this.Init(brokerIpAddress.ToString(), brokerPort, secure, caCert, clientCert, sslProtocol, null, null);
-#else
-            this.Init(brokerIpAddress.ToString(), brokerPort, secure, caCert, clientCert, sslProtocol);
-#endif
-        }
-#endif
-
         /// <summary>
         /// Constructor
         /// </summary>

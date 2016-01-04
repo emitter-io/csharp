@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Emitter.cs" />
     <Compile Include="Exceptions\MqttClientException.cs" />
     <Compile Include="Exceptions\MqttCommunicationException.cs" />
     <Compile Include="Exceptions\MqttConnectionException.cs" />
@@ -80,7 +81,6 @@
     <Compile Include="Net\MqttNetworkChannel.cs" />
     <Compile Include="MqttSettings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Session\MqttBrokerSession.cs" />
     <Compile Include="Session\MqttClientSession.cs" />
     <Compile Include="Session\MqttSession.cs" />
     <Compile Include="Utility\Trace.cs" />

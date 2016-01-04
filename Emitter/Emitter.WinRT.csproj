@@ -76,7 +76,7 @@
     <Compile Include="MqttSecurity.cs" />
     <Compile Include="MqttSettings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Session\MqttBrokerSession.cs" />
+    <Compile Include="Emitter.cs" />
     <Compile Include="Session\MqttClientSession.cs" />
     <Compile Include="Session\MqttSession.cs" />
     <Compile Include="Utility\QueueExtension.cs" />

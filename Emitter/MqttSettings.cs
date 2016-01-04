@@ -22,8 +22,8 @@ namespace Emitter.Network
     public class MqttSettings
     {
         // default port for MQTT protocol
-        public const int MQTT_BROKER_DEFAULT_PORT = 1883;
-        public const int MQTT_BROKER_DEFAULT_SSL_PORT = 8883;
+        public const int MQTT_BROKER_DEFAULT_PORT = 8080;
+        public const int MQTT_BROKER_DEFAULT_SSL_PORT = 8080;
         // default timeout on receiving from client
         public const int MQTT_DEFAULT_TIMEOUT = 30000;
         // max publish, subscribe and unsubscribe retry for QoS Level 1 or 2
