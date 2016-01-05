@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using Emitter.Network.Messages;
 using Emitter.Network.Utility;
 #if (MF_FRAMEWORK_VERSION_V4_2 || MF_FRAMEWORK_VERSION_V4_3)
 using Microsoft.SPOT;
@@ -118,7 +119,7 @@ namespace Emitter.Network
             this.Trie.RegisterHandler(channel, handler);
 
             // Subscribe
-            return this.Client.Subscribe(new string[] { FormatChannel(key, channel) }, new byte[] { 0 });
+            return this.Client.Subscribe(new string[] { FormatChannel(key, channel) }, new byte[] { MqttMsgBase.QOS_LEVEL_AT_MOST_ONCE });
         }
 
         /// <summary>
