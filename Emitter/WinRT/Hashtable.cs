@@ -24,4 +24,9 @@ namespace Emitter.Network
     public class Hashtable : Dictionary<object, object>
     {
     }
+
+    public class Stack : Stack<object>
+    {
+
+    }
 }

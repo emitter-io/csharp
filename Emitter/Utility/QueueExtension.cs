@@ -16,6 +16,7 @@ Contributors:
 
 using System;
 using System.Collections;
+using System.Threading;
 
 namespace Emitter.Network.Utility
 {
@@ -46,5 +47,81 @@ namespace Emitter.Network.Utility
             }
             return null;
         }
+
+#if MF_FRAMEWORK_VERSION_V4_2 || MF_FRAMEWORK_VERSION_V4_3 || COMPACT_FRAMEWORK
+        /// <summary>
+        /// Gets whether the hashtable contains the key.
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        internal static bool ContainsKey(this Hashtable source, object key)
+        {
+            return source.Contains(key);
+        }
+#endif
+
+        /// <summary>
+        /// Attempts to fetch a value.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="source"></param>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        internal static bool TryGetValue(this Hashtable source, object key, out object value)
+        {
+            value = null;
+            Monitor.Enter(source);
+            try
+            {
+                if (!source.ContainsKey(key))
+                    return false;
+
+                value = source[key];
+                return true;
+            }
+            catch(Exception ex)
+            {
+#if TRACE
+                Trace.WriteLine(TraceLevel.Error, ex.Message);
+#endif
+                return false;
+            }
+            finally
+            {
+                Monitor.Exit(source);
+            }
+        }
+
+        /// <summary>
+        /// Gets or adds a value to the hashtable.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="source"></param>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        internal static object GetOrAdd(this Hashtable source, object key, object value)
+        {
+            Monitor.Enter(source);
+            try
+            {
+                // Do we have it?
+                if (source.ContainsKey(key))
+                    return source[key];
+
+                source[key] = value;
+                return value;
+            }
+            finally
+            {
+                Monitor.Exit(source);
+            }
+        }
     }
+
+    public delegate MessageHandler AddFunc();
+    public delegate MessageHandler UpdateFunc(MessageHandler old);
 }
+
