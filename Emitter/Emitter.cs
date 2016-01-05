@@ -9,31 +9,174 @@ using Microsoft.SPOT;
 namespace Emitter.Network
 {
     /// <summary>
+    /// Represents a message handler callback.
+    /// </summary>
+    public delegate void MessageHandler(string channel, byte[] message);
+
+
+    /// <summary>
     /// Represents emitter.io MQTT-based client.
     /// </summary>
     public class Emitter
     {
+        #region Constants
+        private const string NoDefaultKey = "The default key was not provided. Either provide a default key in the constructor or specify a key for the operation.";
+        #endregion
+
         #region Constructors
         private readonly MqttClient Client;
         private readonly ReverseTrie Trie = new ReverseTrie(-1);
+        private bool TlsSecure = false;
+        private string DefaultKey = null;
 
         /// <summary>
         /// Constructs a new emitter.io connection.
         /// </summary>
-        public Emitter() : this("api.emitter.io") { }
+        public Emitter() : this("api.emitter.io", null, false) { }
+
+        /// <summary>
+        /// Constructs a new emitter.io connection.
+        /// </summary>
+        /// <param name="defaultKey">The default key to use.</param>
+        public Emitter(string defaultKey) : this("api.emitter.io", defaultKey, false) { }
+
+        /// <summary>
+        /// Constructs a new emitter.io connection.
+        /// </summary>
+        /// <param name="useTls">Whether we should use TLS security.</param>
+        public Emitter(bool useTls) : this("api.emitter.io", null, useTls) { }
+
+        /// <summary>
+        /// Constructs a new emitter.io connection.
+        /// </summary>
+        /// <param name="defaultKey">The default key to use.</param>
+        /// <param name="useTls">Whether we should use TLS security.</param>
+        public Emitter(string defaultKey, bool useTls) : this("api.emitter.io", defaultKey, useTls) { }
 
         /// <summary>
         /// Constructs a new emitter.io connection.
         /// </summary>
         /// <param name="broker">The broker hostname to use.</param>
-        public Emitter(string broker)
+        /// <param name="defaultKey">The default key to use.</param>
+        /// <param name="useTls">Whether we should use TLS security.</param>
+        public Emitter(string broker, string defaultKey, bool useTls)
         {
+            this.DefaultKey = defaultKey;
+            this.TlsSecure = useTls;
             this.Client = new MqttClient(broker);
             this.Client.MqttMsgPublishReceived += OnMessageReceived;
         }
         #endregion
 
-        #region Events
+        #region Static Members
+        /// <summary>
+        /// Gets the default instance of the client.
+        /// </summary>
+        public static readonly Emitter Default = new Emitter();
+        #endregion
+
+        /// <summary>
+        /// Connects the emitter.io service.
+        /// </summary>
+        public void Connect()
+        {
+            var connack = this.Client.Connect(Guid.NewGuid().ToString());
+        }
+        
+        /// <summary>
+        /// Disconnects from emitter.io service.
+        /// </summary>
+        public void Disconnect()
+        {
+            this.Client.Disconnect();
+        }
+
+        /// <summary>
+        /// Asynchronously subscribes to a particular channel of emitter.io service. Uses the default
+        /// key that should be specified in the constructor.
+        /// </summary>
+        /// <param name="channel">The channel to subscribe to.</param>
+        /// <param name="handler">The callback to be invoked every time the message is received.</param>
+        /// <returns>The message identifier for this operation.</returns>
+        public ushort On(string channel, MessageHandler handler)
+        {
+            if (this.DefaultKey == null)
+                throw new ArgumentNullException(NoDefaultKey);
+            return this.On(this.DefaultKey, channel, handler);
+        }
+
+        /// <summary>
+        /// Asynchronously subscribes to a particular channel of emitter.io service.
+        /// </summary>
+        /// <param name="key">The key to use for this subscription request.</param>
+        /// <param name="channel">The channel to subscribe to.</param>
+        /// <param name="handler">The callback to be invoked every time the message is received.</param>
+        /// <returns>The message identifier for this operation.</returns>
+        public ushort On(string key, string channel, MessageHandler handler)
+        {
+            // Register the handler
+            this.Trie.RegisterHandler(channel, handler);
+
+            // Subscribe
+            return this.Client.Subscribe(new string[] { FormatChannel(key, channel) }, new byte[] { 0 });
+        }
+
+        /// <summary>
+        /// Asynchonously unsubscribes from a particular channel of emitter.io service. Uses the default
+        /// key that should be specified in the constructor.
+        /// </summary>
+        /// <param name="channel">The channel to subscribe to.</param>
+        /// <returns>The message identifier for this operation.</returns>
+        public ushort Unsubscribe(string channel)
+        {
+            if (this.DefaultKey == null)
+                throw new ArgumentNullException(NoDefaultKey);
+            return this.Unsubscribe(this.DefaultKey, channel);
+        }
+
+        /// <summary>
+        /// Asynchonously unsubscribes from a particular channel of emitter.io service.
+        /// </summary>
+        /// <param name="key">The key to use for this unsubscription request.</param>
+        /// <param name="channel">The channel to subscribe to.</param>
+        /// <returns>The message identifier for this operation.</returns>
+        public ushort Unsubscribe(string key, string channel)
+        {
+            // Unregister the handler
+            this.Trie.UnregisterHandler(key);
+
+            // Unsubscribe
+            return this.Client.Unsubscribe(new string[] { FormatChannel( key, channel) });
+        }
+
+
+        /// <summary>
+        /// Asynchonously publishes a message to the emitter.io service. Uses the default
+        /// key that should be specified in the constructor.
+        /// </summary>
+        /// <param name="channel">The channel to publish to.</param>
+        /// <param name="message">The message body to send.</param>
+        /// <returns>The message identifier for this operation.</returns>
+        public ushort Publish(string channel, byte[] message)
+        {
+            if (this.DefaultKey == null)
+                throw new ArgumentNullException(NoDefaultKey);
+            return this.Publish(this.DefaultKey, channel, message);
+        }
+
+        /// <summary>
+        /// Publishes a message to the emitter.io service asynchronously.
+        /// </summary>
+        /// <param name="key">The key to use for this publish request.</param>
+        /// <param name="channel">The channel to publish to.</param>
+        /// <param name="message">The message body to send.</param>
+        /// <returns>The message identifier.</returns>
+        public ushort Publish(string key, string channel, byte[] message)
+        {
+            return this.Client.Publish(FormatChannel(key, channel), message);
+        }
+
+        #region Private Members
         /// <summary>
         /// Occurs when a message is received.
         /// </summary>
@@ -42,52 +185,46 @@ namespace Emitter.Network
         private void OnMessageReceived(object sender, Messages.MqttMsgPublishEventArgs e)
         {
             // Invoke every handler matching the channel
-            foreach(MessageHandler handler in this.Trie.Match(e.Topic))
+            foreach (MessageHandler handler in this.Trie.Match(e.Topic))
                 handler(e.Topic, e.Message);
         }
+
+        /// <summary>
+        /// Formats the channel.
+        /// </summary>
+        /// <param name="key">The key to add.</param>
+        /// <param name="channel">The channel name.</param>
+        /// <param name="options">The options.</param>
+        /// <returns></returns>
+        private string FormatChannel(string key, string channel, params Option[] options)
+        {
+            // Prefix with the key
+            var formatted = (channel[0] == '/')
+                ? key + channel
+                : key + "/" + channel;
+
+            // Add trailing slash
+            if (formatted[formatted.Length - 1] != '/')
+                formatted += "/";
+
+            // Add options
+            if (options != null && options.Length > 0)
+            {
+                formatted += "?";
+                for (int i=0; i < options.Length; ++i)
+                {
+                    formatted += options[i].Key + "=" + options[i].Value;
+                    if (i + 1 < options.Length)
+                        formatted += "&";
+                }
+                    
+            }
+
+            // We're done compiling the channel name
+            return formatted;
+        }
         #endregion
-
-        public void Connect()
-        {
-            var connack = this.Client.Connect(Guid.NewGuid().ToString());
-        }
-
-        public void Disconnect()
-        {
-            this.Client.Disconnect();
-        }
-
-        public void On(string key, string channel, MessageHandler handler)
-        {
-            // Register the handler
-            this.Trie.RegisterHandler(channel, handler);
-
-            // Subscribe
-            this.Client.Subscribe(new string[] { channel }, new byte[] { 0 });
-        }
-
-        public void Unsubscribe(string key, string channel)
-        {
-            // Unregister the handler
-            this.Trie.UnregisterHandler(key);
-
-            // Unsubscribe
-            this.Client.Unsubscribe(new string[] { channel });
-        }
-
-        public void Publish(string key, string channel, byte[] message)
-        {
-            this.Client.Publish(channel, message);
-        }
     }
-
-    #region Delegates
-    /// <summary>
-    /// Represents a message handler callback.
-    /// </summary>
-    public delegate void MessageHandler(string channel, byte[] message);
-
-    #endregion
 
     #region ReverseTrie
     /// <summary>
@@ -110,7 +247,6 @@ namespace Emitter.Network
             this.Children = new Hashtable();
         }
 
-
         /// <summary>
         /// Adds a new handler for the channel.
         /// </summary>
@@ -119,7 +255,7 @@ namespace Emitter.Network
         public void RegisterHandler(string channel, MessageHandler value)
         {
             // Add the value or replace it.
-            this.AddOrUpdate(this.CreateKey(channel), 0, () => value, (old) => value);
+            this.AddOrUpdate(CreateKey(channel), 0, () => value, (old) => value);
         }
 
         /// <summary>
@@ -129,7 +265,7 @@ namespace Emitter.Network
         public void UnregisterHandler(string channel)
         {
             MessageHandler removed;
-            this.TryRemove(this.CreateKey(channel), 0, out removed);
+            this.TryRemove(CreateKey(channel), 0, out removed);
         }
         
         /// <summary>
@@ -141,7 +277,7 @@ namespace Emitter.Network
         public IEnumerable Match(string channel)
         {
             // Get the query
-            var query = this.CreateKey(channel);
+            var query = CreateKey(channel);
 
             // Get the matching stack
             var matches = new Stack();
@@ -172,7 +308,7 @@ namespace Emitter.Network
         /// </summary>
         /// <param name="channel"></param>
         /// <returns></returns>
-        private string[] CreateKey(string channel)
+        public static string[] CreateKey(string channel)
         {
             return channel.Split('/');
         }
@@ -203,7 +339,6 @@ namespace Emitter.Network
             var child = Children.GetOrAdd(key[position], new ReverseTrie((short)position)) as ReverseTrie;
             return child.AddOrUpdate(key, position + 1, addFunc, updateFunc);
         }
-
 
         /// <summary>
         /// Attempts to remove a specific key from the Trie.
