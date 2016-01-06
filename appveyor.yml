@@ -1,0 +1,29 @@
+version: 1.0.{build}
+
+branches:
+  only:
+    - master
+
+assembly_info:
+  patch: true
+  file: AssemblyInfo.*
+  assembly_version: "{version}"
+  assembly_file_version: "{version}"
+  assembly_informational_version: "{version}"
+
+configuration: Release
+
+build:
+  project: Emitter.sln
+
+after_test:
+  - ps: .\Deploy\pack.ps1  
+
+artifacts:
+  - path: '**\*.nupkg'
+
+deploy:
+  provider: NuGet
+  api_key:
+    secure: rU+w5deWOMiUmQES2u4bz1o0ElWYIfjxKVokp+QUjjidbGiRJwK6s1LcTNRrAde3
+  artifact: /.*\.nupkg/  
