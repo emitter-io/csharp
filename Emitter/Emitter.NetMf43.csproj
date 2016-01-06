@@ -38,6 +38,8 @@
     <Compile Include="Internal\InternalEvent.cs" />
     <Compile Include="Internal\MsgInternalEvent.cs" />
     <Compile Include="Internal\MsgPublishedInternalEvent.cs" />
+        <Compile Include="Messages\KeygenResponse.cs" />
+    <Compile Include="Messages\KeygenRequest.cs" />
     <Compile Include="Messages\MqttMsgBase.cs" />
     <Compile Include="Messages\MqttMsgConnack.cs" />
     <Compile Include="Messages\MqttMsgConnect.cs" />

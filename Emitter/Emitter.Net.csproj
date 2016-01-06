@@ -54,6 +54,8 @@
     <Compile Include="Internal\MsgPublishedInternalEvent.cs" />
     <Compile Include="Json\JsonParser.cs" />
     <Compile Include="Json\JsonSerializer.cs" />
+    <Compile Include="Messages\KeygenResponse.cs" />
+    <Compile Include="Messages\KeygenRequest.cs" />
     <Compile Include="Messages\MqttMsgBase.cs" />
     <Compile Include="Messages\MqttMsgConnack.cs" />
     <Compile Include="Messages\MqttMsgConnect.cs" />

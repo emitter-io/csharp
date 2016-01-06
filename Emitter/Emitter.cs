@@ -14,6 +14,7 @@ Contributors:
 
 using System;
 using System.Collections;
+using System.Text;
 using Emitter.Network.Messages;
 using Emitter.Network.Utility;
 #if (MF_FRAMEWORK_VERSION_V4_2 || MF_FRAMEWORK_VERSION_V4_3)
@@ -34,11 +35,9 @@ namespace Emitter.Network
     /// </summary>
     public class Emitter
     {
-        #region Constants
-        private const string NoDefaultKey = "The default key was not provided. Either provide a default key in the constructor or specify a key for the operation.";
-        #endregion
-
         #region Constructors
+        private const string NoDefaultKey = "The default key was not provided. Either provide a default key in the constructor or specify a key for the operation.";
+
         private readonly MqttClient Client;
         private readonly ReverseTrie Trie = new ReverseTrie(-1);
         private bool TlsSecure = false;
@@ -90,6 +89,7 @@ namespace Emitter.Network
         public static readonly Emitter Default = new Emitter();
         #endregion
 
+        #region Connect / Disconnect Members
         /// <summary>
         /// Connects the emitter.io service.
         /// </summary>
@@ -105,7 +105,9 @@ namespace Emitter.Network
         {
             this.Client.Disconnect();
         }
+        #endregion
 
+        #region Subscribe / Unsubscribe Members
         /// <summary>
         /// Asynchronously subscribes to a particular channel of emitter.io service. Uses the default
         /// key that should be specified in the constructor.
@@ -163,8 +165,9 @@ namespace Emitter.Network
             // Unsubscribe
             return this.Client.Unsubscribe(new string[] { FormatChannel( key, channel) });
         }
+        #endregion
 
-
+        #region Publish Members
         /// <summary>
         /// Asynchonously publishes a message to the emitter.io service. Uses the default
         /// key that should be specified in the constructor.
@@ -190,6 +193,40 @@ namespace Emitter.Network
         {
             return this.Client.Publish(FormatChannel(key, channel), message);
         }
+        #endregion
+
+        #region KeyGen Members
+        /// <summary>
+        /// Asynchronously sends a key generation request to the emitter.io service.
+        /// </summary>
+        /// <param name="secretKey">The secret key for this request.</param>
+        /// <param name="channel">The target channel for the requested key.</param>
+        /// <param name="keyType">The type of the requested key.</param>
+        public void GenerateKey(string secretKey, string channel, EmitterKeyType keyType)
+        {
+            this.GenerateKey(secretKey, channel, keyType, 0);
+        }
+
+        /// <summary>
+        /// Asynchronously sends a key generation request to the emitter.io service.
+        /// </summary>
+        /// <param name="secretKey">The secret key for this request.</param>
+        /// <param name="channel">The target channel for the requested key.</param>
+        /// <param name="keyType">The type of the requested key.</param>
+        /// <param name="ttl">The number of seconds for which this key will be usable.</param>
+        public void GenerateKey(string secretKey, string channel, EmitterKeyType keyType, int ttl)
+        {
+            // Prepare the request
+            var request = new KeygenRequest();
+            request.Key = secretKey;
+            request.Channel = channel;
+            request.Type = keyType;
+            request.Ttl = ttl;
+
+            // Serialize and publish the request
+            this.Publish("emitter/", "keygen/", Encoding.UTF8.GetBytes(request.ToJson()));
+        }
+        #endregion
 
         #region Private Members
         /// <summary>
@@ -232,7 +269,6 @@ namespace Emitter.Network
                     if (i + 1 < options.Length)
                         formatted += "&";
                 }
-                    
             }
 
             // We're done compiling the channel name
