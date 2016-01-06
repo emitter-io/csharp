@@ -24,3 +24,46 @@ This library provides a nicer MQTT interface fine-tuned and extended with specif
 * To build for .Net Micro Framework 4.2 or 4.3, you need to download .Net Micro Framework SDK from CodePlex: https://netmf.codeplex.com/
 * To build for .Net Micro Framework 4.4, you need to download .Net Micro Framework SDK from GitHub: https://github.com/NETMF/netmf-interpreter/releases
 
+# Usage
+
+Below is a sample program written using this C# client library. This demonstrates a simple console chat app where the messages are published to `chat` channel and every connected client receives them in real-time.
+
+```
+// Creating a connection to emitter.io service.
+var emitter    = new Emitter.Connection();
+var channelKey = "<channel key for 'chat' channel>";
+
+// Connect to emitter.io service
+emitter.Connect();
+
+// Handle chat messages
+emitter.On(channelKey, "chat", (channel, msg) =>
+{
+    Console.WriteLine(Encoding.UTF8.GetString(msg));
+});
+
+// Publish messages to the 'chat' channel
+string text = "";
+Console.WriteLine("Type to chat or 'q' to exit...");
+do
+{
+    text = Console.ReadLine();
+    emitter.Publish(channelKey, "chat", text);
+}
+while (text != "q");
+
+// Disconnect the client
+emitter.Disconnect();
+```
+
+To generate a channel key using the secret key provided, the `GenerateKey` method can be used.
+
+```
+// Generate a read-write key for our channel
+emitter.GenerateKey(
+    "<secret key>", 
+    "chat", 
+    Messages.EmitterKeyType.ReadWrite, 
+    (response) => Console.WriteLine("Generated Key: " + response.Key)
+    );
+```
