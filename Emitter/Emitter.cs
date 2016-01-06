@@ -183,6 +183,32 @@ namespace Emitter
         }
 
         /// <summary>
+        /// Asynchonously publishes a message to the emitter.io service. Uses the default
+        /// key that should be specified in the constructor.
+        /// </summary>
+        /// <param name="channel">The channel to publish to.</param>
+        /// <param name="message">The message body to send.</param>
+        /// <returns>The message identifier for this operation.</returns>
+        public ushort Publish(string channel, string message)
+        {
+            if (this.DefaultKey == null)
+                throw new ArgumentNullException(NoDefaultKey);
+            return this.Publish(this.DefaultKey, channel, Encoding.UTF8.GetBytes(message));
+        }
+
+        /// <summary>
+        /// Publishes a message to the emitter.io service asynchronously.
+        /// </summary>
+        /// <param name="key">The key to use for this publish request.</param>
+        /// <param name="channel">The channel to publish to.</param>
+        /// <param name="message">The message body to send.</param>
+        /// <returns>The message identifier.</returns>
+        public ushort Publish(string key, string channel, string message)
+        {
+            return this.Client.Publish(FormatChannel(key, channel), Encoding.UTF8.GetBytes(message));
+        }
+
+        /// <summary>
         /// Publishes a message to the emitter.io service asynchronously.
         /// </summary>
         /// <param name="key">The key to use for this publish request.</param>
@@ -249,6 +275,8 @@ namespace Emitter
             {
                 // Deserialize the response
                 var response = KeygenResponse.FromBinary(e.Message);
+                if (response == null || response.Status != 200)
+                    return; // TODO: Log this
 
                 // Call the response handler we have registered previously
                 if (this.KeygenHandlers.ContainsKey(response.Channel))

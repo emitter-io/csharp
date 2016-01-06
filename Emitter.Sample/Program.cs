@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using Emitter;
 
 namespace Emitter.Sample
@@ -8,20 +9,34 @@ namespace Emitter.Sample
         static void Main(string[] args)
         {
             var emitter = Connection.Default;
+            var channelKey = "<channel key for 'chat' channel>";
 
             // Connect to emitter.io service
             emitter.Connect();
 
-            //
-            emitter.GenerateKey("<secret key>", "welcome", Messages.EmitterKeyType.ReadWrite, (keygen) =>
+            // Generate a read-write key for our channel
+            emitter.GenerateKey("<secret key>", "chat", Messages.EmitterKeyType.ReadWrite, (keygen) =>
             {
-                Console.WriteLine(keygen.Key);
+                Console.WriteLine("Generated Key: " + keygen.Key);
             });
 
+            // Handle chat messages
+            emitter.On(channelKey, "chat", (channel, msg) =>
+            {
+                Console.WriteLine(Encoding.UTF8.GetString(msg));
+            });
 
-            Console.WriteLine("Press any key to exit...");
-            Console.ReadKey();
-            Environment.Exit(0);
+            string text = "";
+            Console.WriteLine("Type to chat or type 'q' to exit...");
+            do
+            {
+                text = Console.ReadLine();
+                emitter.Publish(channelKey, "chat", text);
+            }
+            while (text != "q");
+
+            // Disconnect the client
+            emitter.Disconnect();
         }
     }
 }
