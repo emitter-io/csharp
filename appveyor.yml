@@ -12,6 +12,10 @@ assembly_info:
   assembly_informational_version: "{version}"
 
 configuration: Release
+os: Visual Studio 2015
+
+install:
+  - cmd: set PATH=C:\Program Files (x86)\MSBuild\14.0\Bin;%PATH%
 
 before_build:
   - ps: .\Deploy\install-fxmicroframework-43-44.ps1
