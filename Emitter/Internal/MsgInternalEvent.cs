@@ -15,9 +15,9 @@ Contributors:
 */
 
 
-using Emitter.Network.Messages;
+using Emitter.Messages;
 
-namespace Emitter.Network.Internal
+namespace Emitter.Internal
 {
     /// <summary>
     /// Internal event with a message

@@ -17,7 +17,7 @@ Contributors:
 
 using System;
 
-namespace Emitter.Network.Exceptions
+namespace Emitter.Exceptions
 {
     /// <summary>
     /// Exception due to error communication with broker on socket

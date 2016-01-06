@@ -18,7 +18,7 @@ Contributors:
 using System;
 using System.Text;
 
-namespace Emitter.Network.Messages
+namespace Emitter.Messages
 {
     /// <summary>
     /// Base class for all MQTT messages

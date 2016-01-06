@@ -15,7 +15,7 @@ Contributors:
 */
 
 
-namespace Emitter.Network
+namespace Emitter
 {
     /// <summary>
     /// Settings class for the MQTT broker

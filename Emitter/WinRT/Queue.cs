@@ -17,7 +17,7 @@ Contributors:
 
 using System.Collections.Generic;
 
-namespace Emitter.Network
+namespace Emitter
 {
     /// <summary>
     /// Wrapper Queue class for generic Queue<T> (the only available in WinRT)

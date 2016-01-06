@@ -17,7 +17,7 @@ Contributors:
 using System;
 using System.Text;
 
-namespace Emitter.Network
+namespace Emitter
 {
     /// <summary>
     /// Interface for channel under MQTT library

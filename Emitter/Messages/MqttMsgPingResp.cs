@@ -16,9 +16,9 @@ Contributors:
 
 
 using System;
-using Emitter.Network.Exceptions;
+using Emitter.Exceptions;
 
-namespace Emitter.Network.Messages
+namespace Emitter.Messages
 {
     /// <summary>
     /// Class for PINGRESP message from client to broker

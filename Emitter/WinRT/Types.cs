@@ -17,7 +17,7 @@ Contributors:
 
 using System.Collections.Generic;
 
-namespace Emitter.Network
+namespace Emitter
 {
     /// <summary>
     /// Wrapper Hashtable class for generic Dictionary<TKey,TValue> (the only available in WinRT)

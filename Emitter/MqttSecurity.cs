@@ -15,7 +15,7 @@ Contributors:
 */
 
 
-namespace Emitter.Network
+namespace Emitter
 {
     /// <summary>
     /// Supported SSL/TLS protocol versions

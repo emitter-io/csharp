@@ -17,7 +17,7 @@ using System;
 using System.Collections;
 using System.Text;
 
-namespace Emitter.Network.Messages
+namespace Emitter.Messages
 {
     /// <summary>
     /// Represents a key generation request.

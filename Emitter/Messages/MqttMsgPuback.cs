@@ -15,9 +15,9 @@ Contributors:
 */
 
 
-using Emitter.Network.Exceptions;
+using Emitter.Exceptions;
 
-namespace Emitter.Network.Messages
+namespace Emitter.Messages
 {
     /// <summary>
     /// Class for PUBACK message from broker to client

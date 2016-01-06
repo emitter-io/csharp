@@ -16,7 +16,7 @@ Contributors:
 
 using System.Collections;
 
-namespace Emitter.Network.Session
+namespace Emitter.Session
 {
     /// <summary>
     /// MQTT Session base class

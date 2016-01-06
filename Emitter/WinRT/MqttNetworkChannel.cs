@@ -26,7 +26,7 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Storage.Streams;
 using System.Threading;
 
-namespace Emitter.Network
+namespace Emitter
 {
     public class MqttNetworkChannel : IMqttNetworkChannel
     {

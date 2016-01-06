@@ -15,7 +15,7 @@ Contributors:
 */
 
 
-namespace Emitter.Network.Internal
+namespace Emitter.Internal
 {
     /// <summary>
     /// Generic internal event for dispatching

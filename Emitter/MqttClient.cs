@@ -22,11 +22,11 @@ using System.Net.Sockets;
 using System.Security.Cryptography.X509Certificates;
 #endif
 using System.Threading;
-using Emitter.Network.Exceptions;
-using Emitter.Network.Messages;
-using Emitter.Network.Session;
-using Emitter.Network.Utility;
-using Emitter.Network.Internal;
+using Emitter.Exceptions;
+using Emitter.Messages;
+using Emitter.Session;
+using Emitter.Utility;
+using Emitter.Internal;
 // if .Net Micro Framework
 #if (MF_FRAMEWORK_VERSION_V4_2 || MF_FRAMEWORK_VERSION_V4_3)
 using Microsoft.SPOT;
@@ -50,10 +50,10 @@ using System.Collections;
 
 // alias needed due to Microsoft.SPOT.Trace in .Net Micro Framework
 // (it's ambiguos with Emitter.Network.Utility.Trace)
-using MqttUtility = Emitter.Network.Utility;
+using MqttUtility = Emitter.Utility;
 using System.IO;
 
-namespace Emitter.Network
+namespace Emitter
 {
     /// <summary>
     /// MQTT Client

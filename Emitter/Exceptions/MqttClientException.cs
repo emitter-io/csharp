@@ -16,7 +16,7 @@ Contributors:
 
 using System;
 
-namespace Emitter.Network.Exceptions
+namespace Emitter.Exceptions
 {
     /// <summary>
     /// MQTT client exception

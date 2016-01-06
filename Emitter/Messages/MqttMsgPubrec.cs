@@ -15,9 +15,9 @@ Contributors:
 */
 
 
-using Emitter.Network.Exceptions;
+using Emitter.Exceptions;
 
-namespace Emitter.Network.Messages
+namespace Emitter.Messages
 {
     /// <summary>
     /// Class for PUBREC message from broker to client

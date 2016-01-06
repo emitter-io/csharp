@@ -15,14 +15,14 @@ Contributors:
 using System;
 using System.Collections;
 using System.Text;
-using Emitter.Network.Messages;
-using Emitter.Network.Utility;
+using Emitter.Messages;
+using Emitter.Utility;
 #if (MF_FRAMEWORK_VERSION_V4_2 || MF_FRAMEWORK_VERSION_V4_3)
 using Microsoft.SPOT;
 #endif
 
 
-namespace Emitter.Network
+namespace Emitter
 {
     /// <summary>
     /// Represents a message handler callback.
@@ -33,7 +33,7 @@ namespace Emitter.Network
     /// <summary>
     /// Represents emitter.io MQTT-based client.
     /// </summary>
-    public class Emitter
+    public class Connection
     {
         #region Constructors
         private const string NoDefaultKey = "The default key was not provided. Either provide a default key in the constructor or specify a key for the operation.";
@@ -46,26 +46,26 @@ namespace Emitter.Network
         /// <summary>
         /// Constructs a new emitter.io connection.
         /// </summary>
-        public Emitter() : this("api.emitter.io", null, false) { }
+        public Connection() : this("api.emitter.io", null, false) { }
 
         /// <summary>
         /// Constructs a new emitter.io connection.
         /// </summary>
         /// <param name="defaultKey">The default key to use.</param>
-        public Emitter(string defaultKey) : this("api.emitter.io", defaultKey, false) { }
+        public Connection(string defaultKey) : this("api.emitter.io", defaultKey, false) { }
 
         /// <summary>
         /// Constructs a new emitter.io connection.
         /// </summary>
         /// <param name="useTls">Whether we should use TLS security.</param>
-        public Emitter(bool useTls) : this("api.emitter.io", null, useTls) { }
+        public Connection(bool useTls) : this("api.emitter.io", null, useTls) { }
 
         /// <summary>
         /// Constructs a new emitter.io connection.
         /// </summary>
         /// <param name="defaultKey">The default key to use.</param>
         /// <param name="useTls">Whether we should use TLS security.</param>
-        public Emitter(string defaultKey, bool useTls) : this("api.emitter.io", defaultKey, useTls) { }
+        public Connection(string defaultKey, bool useTls) : this("api.emitter.io", defaultKey, useTls) { }
 
         /// <summary>
         /// Constructs a new emitter.io connection.
@@ -73,7 +73,7 @@ namespace Emitter.Network
         /// <param name="broker">The broker hostname to use.</param>
         /// <param name="defaultKey">The default key to use.</param>
         /// <param name="useTls">Whether we should use TLS security.</param>
-        public Emitter(string broker, string defaultKey, bool useTls)
+        public Connection(string broker, string defaultKey, bool useTls)
         {
             this.DefaultKey = defaultKey;
             this.TlsSecure = useTls;
@@ -86,7 +86,7 @@ namespace Emitter.Network
         /// <summary>
         /// Gets the default instance of the client.
         /// </summary>
-        public static readonly Emitter Default = new Emitter();
+        public static readonly Connection Default = new Connection();
         #endregion
 
         #region Connect / Disconnect Members
@@ -197,14 +197,19 @@ namespace Emitter.Network
 
         #region KeyGen Members
         /// <summary>
+        /// Hashtable used for processing keygen responses.
+        /// </summary>
+        private readonly Hashtable KeygenHandlers = new Hashtable();
+
+        /// <summary>
         /// Asynchronously sends a key generation request to the emitter.io service.
         /// </summary>
         /// <param name="secretKey">The secret key for this request.</param>
         /// <param name="channel">The target channel for the requested key.</param>
         /// <param name="keyType">The type of the requested key.</param>
-        public void GenerateKey(string secretKey, string channel, EmitterKeyType keyType)
+        public void GenerateKey(string secretKey, string channel, EmitterKeyType keyType, KeygenHandler handler)
         {
-            this.GenerateKey(secretKey, channel, keyType, 0);
+            this.GenerateKey(secretKey, channel, keyType, 0, handler);
         }
 
         /// <summary>
@@ -214,7 +219,7 @@ namespace Emitter.Network
         /// <param name="channel">The target channel for the requested key.</param>
         /// <param name="keyType">The type of the requested key.</param>
         /// <param name="ttl">The number of seconds for which this key will be usable.</param>
-        public void GenerateKey(string secretKey, string channel, EmitterKeyType keyType, int ttl)
+        public void GenerateKey(string secretKey, string channel, EmitterKeyType keyType, int ttl, KeygenHandler handler)
         {
             // Prepare the request
             var request = new KeygenRequest();
@@ -222,6 +227,9 @@ namespace Emitter.Network
             request.Channel = channel;
             request.Type = keyType;
             request.Ttl = ttl;
+
+            // Register the handler
+            this.KeygenHandlers[channel] = handler;
 
             // Serialize and publish the request
             this.Publish("emitter/", "keygen/", Encoding.UTF8.GetBytes(request.ToJson()));
@@ -236,6 +244,18 @@ namespace Emitter.Network
         /// <param name="e"></param>
         private void OnMessageReceived(object sender, Messages.MqttMsgPublishEventArgs e)
         {
+            // Did we receive a keygen response?
+            if(e.Topic == "emitter/keygen/")
+            {
+                // Deserialize the response
+                var response = KeygenResponse.FromBinary(e.Message);
+
+                // Call the response handler we have registered previously
+                if (this.KeygenHandlers.ContainsKey(response.Channel))
+                    ((KeygenHandler)this.KeygenHandlers[response.Channel])(response);
+                return;
+            }
+
             // Invoke every handler matching the channel
             foreach (MessageHandler handler in this.Trie.Match(e.Topic))
                 handler(e.Topic, e.Message);
@@ -251,12 +271,12 @@ namespace Emitter.Network
         private string FormatChannel(string key, string channel, params Option[] options)
         {
             // Prefix with the key
-            var formatted = (channel[0] == '/')
+            var formatted = channel.EndsWith("/")
                 ? key + channel
                 : key + "/" + channel;
 
             // Add trailing slash
-            if (formatted[formatted.Length - 1] != '/')
+            if (!formatted.EndsWith("/"))
                 formatted += "/";
 
             // Add options

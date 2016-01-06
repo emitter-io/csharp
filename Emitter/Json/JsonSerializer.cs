@@ -26,7 +26,7 @@ using System.Text;
 using Microsoft.SPOT;
 #endif
 
-namespace Emitter.Network
+namespace Emitter
 {
 	/// <summary>
     /// JSON.NetMF - JSON Serialization and Deserialization library for .NET Micro Framework

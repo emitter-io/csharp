@@ -28,7 +28,7 @@ using System.Text;
 using Microsoft.SPOT;
 #endif
 
-namespace Emitter.Network
+namespace Emitter
 {
 	/// <summary>
 	/// Parses JSON strings into a Hashtable.  The Hashtable contains one or more key/value pairs

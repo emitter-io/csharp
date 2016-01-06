@@ -17,7 +17,7 @@ Contributors:
 
 using System;
 
-namespace Emitter.Network.Exceptions
+namespace Emitter.Exceptions
 {
     /// <summary>
     /// Connection to the broker exception

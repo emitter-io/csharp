@@ -16,7 +16,7 @@ Contributors:
 
 using System.Diagnostics;
 
-namespace Emitter.Network.Utility
+namespace Emitter.Utility
 {
     /// <summary>
     /// Tracing levels

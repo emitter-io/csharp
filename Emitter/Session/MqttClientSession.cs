@@ -15,7 +15,7 @@ Contributors:
 */
 
 
-namespace Emitter.Network.Session
+namespace Emitter.Session
 {
     /// <summary>
     /// MQTT Client Session

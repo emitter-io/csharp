@@ -21,7 +21,7 @@ using System;
 using Microsoft.SPOT;
 #endif
 
-namespace Emitter.Network.Messages
+namespace Emitter.Messages
 {
     /// <summary>
     /// Event Args class for PUBLISH message received from broker

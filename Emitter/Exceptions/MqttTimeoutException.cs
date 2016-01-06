@@ -17,7 +17,7 @@ Contributors:
 
 using System;
 
-namespace Emitter.Network.Exceptions
+namespace Emitter.Exceptions
 {
     /// <summary>
     /// Timeout on receiving from broker exception

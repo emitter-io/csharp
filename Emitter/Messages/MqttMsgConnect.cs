@@ -16,9 +16,9 @@ Contributors:
 
 using System;
 using System.Text;
-using Emitter.Network.Exceptions;
+using Emitter.Exceptions;
 
-namespace Emitter.Network.Messages
+namespace Emitter.Messages
 {
     /// <summary>
     /// Class for CONNECT message from client to broker

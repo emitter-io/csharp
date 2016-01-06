@@ -17,7 +17,7 @@ using System;
 using System.Collections;
 using System.Text;
 
-namespace Emitter.Network.Messages
+namespace Emitter.Messages
 {
     /// <summary>
     /// Represents a key generation response.
@@ -51,9 +51,26 @@ namespace Emitter.Network.Messages
 
             response.Key = (string)map["key"];
             response.Channel = (string)map["channel"];
-            response.Status = (int)map["status"];
+            response.Status = Convert.ToInt32(map["status"]);
+            
             return response;
         }
 
+        /// <summary>
+        /// Deserializes the JSON key-gen response.
+        /// </summary>
+        /// <param name="message">The binary UTF-8 encoded string.</param>
+        /// <returns></returns>
+        public static KeygenResponse FromBinary(byte[] message)
+        {
+            return FromJson(new string(Encoding.UTF8.GetChars(message)));
+        }
+
     }
+
+    /// <summary>
+    /// Handles the key generation response.
+    /// </summary>
+    /// <param name="response">The keygen response to handle.</param>
+    public delegate void KeygenHandler(KeygenResponse response);
 }

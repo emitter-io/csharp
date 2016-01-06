@@ -17,7 +17,7 @@ Contributors:
 
 using System.Threading;
 
-namespace Emitter.Network
+namespace Emitter
 {
     /// <summary>
     /// Support methods fos specific framework

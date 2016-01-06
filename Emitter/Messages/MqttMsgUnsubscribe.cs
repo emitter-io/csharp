@@ -22,9 +22,9 @@ using System.Collections.Generic;
 #endif
 using System.Collections;
 using System.Text;
-using Emitter.Network.Exceptions;
+using Emitter.Exceptions;
 
-namespace Emitter.Network.Messages
+namespace Emitter.Messages
 {
     /// <summary>
     /// Class for UNSUBSCRIBE message from client to broker
