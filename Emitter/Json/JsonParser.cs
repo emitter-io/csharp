@@ -297,13 +297,13 @@ namespace Emitter
 						{
 							// parse the 32 bit hex into an integer codepoint
 							uint codePoint;
-							if (!(success = new string(json, index, 4).TryParseUInt32(NumberEncoding.Hexadecimal, out codePoint)))
+							if (!(success = Utils.TryParseUInt32(new string(json, index, 4), NumberEncoding.Hexadecimal, out codePoint)))
 							{
 								return "";
 							}
 
 							// convert the integer codepoint to a unicode char and add to string
-							s.Append(((int)codePoint).ConvertFromUtf32());
+							s.Append(Utils.ConvertFromUtf32((int)codePoint));
 
 							// skip 4 chars
 							index += 4;
@@ -371,7 +371,7 @@ namespace Emitter
 					style = NumberEncoding.Hexadecimal;
 				}
 
-				result = value.ParseInt64(style);
+				result = Utils.ParseInt64(value, style);
 			}
 
 			index = lastIndex + 1;

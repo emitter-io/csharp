@@ -227,7 +227,7 @@ namespace Emitter
         /// </summary>
         public void Connect()
         {
-            this.socket = new Socket(this.remoteIpAddress.GetAddressFamily(), SocketType.Stream, ProtocolType.Tcp);
+            this.socket = new Socket(IPAddressUtility.GetAddressFamily(this.remoteIpAddress), SocketType.Stream, ProtocolType.Tcp);
             // try connection to the broker
             this.socket.Connect(new IPEndPoint(this.remoteIpAddress, this.remotePort));
 
@@ -414,7 +414,7 @@ namespace Emitter
         /// </summary>
         /// <param name="ipAddress">IP address to check</param>
         /// <returns>Address family</returns>
-        public static AddressFamily GetAddressFamily(this IPAddress ipAddress)
+        public static AddressFamily GetAddressFamily(IPAddress ipAddress)
         {
 #if (!MF_FRAMEWORK_VERSION_V4_2 && !MF_FRAMEWORK_VERSION_V4_3)
             return ipAddress.AddressFamily;

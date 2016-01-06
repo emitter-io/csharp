@@ -122,11 +122,11 @@ namespace Emitter
                             case DateTimeFormat.Ajax:
                                 // This MSDN page describes the problem with JSON dates:
                                 // http://msdn.microsoft.com/en-us/library/bb299886.aspx
-                                return "\"" + ((DateTime)o).ToASPNetAjax() + "\"";
+                                return "\"" + Utils.ToASPNetAjax((DateTime)o) + "\"";
                             case DateTimeFormat.ISO8601:
                             case DateTimeFormat.Default:
                             default:
-                                return "\"" + ((DateTime)o).ToIso8601() + "\"";
+                                return "\"" + Utils.ToIso8601((DateTime)o) + "\"";
                         }
                     }
             }

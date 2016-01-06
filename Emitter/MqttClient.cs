@@ -861,8 +861,9 @@ namespace Emitter
 
                     // NOTE : I need to find on message id and flow because the broker could be publish/received
                     //        to/from client and message id could be the same (one tracked by broker and the other by client)
-                    MqttMsgContextFinder msgCtxFinder = new MqttMsgContextFinder(msg.MessageId, MqttMsgFlow.ToAcknowledge);
-                    MqttMsgContext msgCtx = (MqttMsgContext)this.inflightQueue.Get(msgCtxFinder.Find);
+                    var msgCtxFinder = new MqttMsgContextFinder(msg.MessageId, MqttMsgFlow.ToAcknowledge);
+                    var msgCtx = (MqttMsgContext)Utils.GetFromQueue(this.inflightQueue, msgCtxFinder.Find);
+                    
 
                     // the PUBLISH message is alredy in the inflight queue, we don't need to re-enqueue but we need
                     // to change state to re-send PUBREC
@@ -980,8 +981,8 @@ namespace Emitter
 
                     // NOTE : I need to find on message id and flow because the broker could be publish/received
                     //        to/from client and message id could be the same (one tracked by broker and the other by client)
-                    MqttMsgContextFinder msgCtxFinder = new MqttMsgContextFinder(msg.MessageId, MqttMsgFlow.ToAcknowledge);
-                    MqttMsgContext msgCtx = (MqttMsgContext)this.inflightQueue.Get(msgCtxFinder.Find);
+                    var msgCtxFinder = new MqttMsgContextFinder(msg.MessageId, MqttMsgFlow.ToAcknowledge);
+                    var msgCtx = (MqttMsgContext)Utils.GetFromQueue(this.inflightQueue, msgCtxFinder.Find);
 
                     // the PUBLISH message isn't in the inflight queue, it was already processed so
                     // we need to re-send PUBCOMP only
@@ -1007,8 +1008,8 @@ namespace Emitter
 
                     // NOTE : I need to find on message id and flow because the broker could be publish/received
                     //        to/from client and message id could be the same (one tracked by broker and the other by client)
-                    MqttMsgContextFinder msgCtxFinder = new MqttMsgContextFinder(msg.MessageId, MqttMsgFlow.ToPublish);
-                    MqttMsgContext msgCtx = (MqttMsgContext)this.inflightQueue.Get(msgCtxFinder.Find);
+                    var msgCtxFinder = new MqttMsgContextFinder(msg.MessageId, MqttMsgFlow.ToPublish);
+                    var msgCtx = (MqttMsgContext)Utils.GetFromQueue(this.inflightQueue, msgCtxFinder.Find);
 
                     // the PUBLISH message isn't in the inflight queue, it was already sent so we need to ignore this PUBCOMP
                     if (msgCtx == null)
@@ -1028,8 +1029,8 @@ namespace Emitter
 
                     // NOTE : I need to find on message id and flow because the broker could be publish/received
                     //        to/from client and message id could be the same (one tracked by broker and the other by client)
-                    MqttMsgContextFinder msgCtxFinder = new MqttMsgContextFinder(msg.MessageId, MqttMsgFlow.ToPublish);
-                    MqttMsgContext msgCtx = (MqttMsgContext)this.inflightQueue.Get(msgCtxFinder.Find);
+                    var msgCtxFinder = new MqttMsgContextFinder(msg.MessageId, MqttMsgFlow.ToPublish);
+                    var msgCtx = (MqttMsgContext)Utils.GetFromQueue(this.inflightQueue, msgCtxFinder.Find);
 
                     // the PUBLISH message isn't in the inflight queue, it was already sent so we need to ignore this PUBREC
                     if (msgCtx == null)

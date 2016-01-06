@@ -31,7 +31,7 @@ namespace System
     /// <summary>
     /// Extension class for a Queue
     /// </summary>
-    internal static class Extensions
+    internal static class Utils
     {
         /// <summary>
         /// Predicate for searching inside a queue
@@ -46,7 +46,7 @@ namespace System
         /// <param name="queue">Queue in which to search</param>
         /// <param name="predicate">Predicate to verify to get item</param>
         /// <returns>Item matches the predicate</returns>
-        internal static object Get(this Queue queue, QueuePredicate predicate)
+        internal static object GetFromQueue(Queue queue, QueuePredicate predicate)
         {
             foreach (var item in queue)
             {
@@ -123,7 +123,7 @@ namespace System
         /// <param name="style"></param>
         /// <param name="result"></param>
         /// <returns></returns>
-        public static bool TryParseUInt32(this string str, NumberEncoding style, out UInt32 result)
+        public static bool TryParseUInt32(string str, NumberEncoding style, out UInt32 result)
         {
             bool sign;
             ulong tmp;
@@ -140,14 +140,14 @@ namespace System
         /// </summary>
         /// <param name="p"></param>
         /// <returns></returns>
-        public static string ConvertFromUtf32(this int p)
+        public static string ConvertFromUtf32(int p)
         {
             char c = (char)p;
             return c.ToString();
         }
 
         
-		public static long ParseInt64(this string str)
+		public static long ParseInt64(string str)
         {
             long result;
             if (TryParseInt64(str, out result))
@@ -157,7 +157,7 @@ namespace System
             throw new Exception();
         }
 
-        public static long ParseInt64(this string str, NumberEncoding style)
+        public static long ParseInt64(string str, NumberEncoding style)
         {
             if (style == NumberEncoding.Hexadecimal)
             {
@@ -167,7 +167,7 @@ namespace System
             return ParseInt64(str);
         }
 
-        public static bool TryParseInt64(this string str, out long result)
+        public static bool TryParseInt64(string str, out long result)
         {
             result = 0;
             ulong r;
@@ -194,7 +194,7 @@ namespace System
             return false;
         }
 
-        private static long ParseInt64Hex(this string str)
+        private static long ParseInt64Hex(string str)
         {
             ulong result;
             if (TryParseInt64Hex(str, out result))
@@ -204,7 +204,7 @@ namespace System
             throw new Exception();
         }
 
-        private static bool TryParseInt64Hex(this string str, out ulong result)
+        private static bool TryParseInt64Hex(string str, out ulong result)
         {
             bool sign;
             return Helper.TryParseUInt64Core(str, true, out result, out sign);
@@ -270,7 +270,7 @@ namespace System
         /// </summary>
         /// <param name="dt"></param>
         /// <returns></returns>
-        public static string ToIso8601(this DateTime dt)
+        public static string ToIso8601(DateTime dt)
         {
             string result = dt.Year.ToString() + "-" +
                             TwoDigits(dt.Month) + "-" +
@@ -325,7 +325,7 @@ namespace System
         /// </summary>
         /// <param name="dt"></param>
         /// <returns></returns>
-        public static string ToASPNetAjax(this DateTime dt)
+        public static string ToASPNetAjax(DateTime dt)
         {
             string value = dt.Ticks.ToString();
 
@@ -337,7 +337,7 @@ namespace System
         /// </summary>
         /// <param name="ajax"></param>
         /// <returns></returns>
-        public static DateTime FromASPNetAjax(this string ajax)
+        public static DateTime FromASPNetAjax(string ajax)
         {
             var parts = ajax.Split(new char[] { '(', ')' });
             var ticks = Convert.ToInt64(parts[1]);
@@ -353,7 +353,7 @@ namespace System
         /// <param name="key"></param>
         /// <param name="value"></param>
         /// <returns></returns>
-        internal static bool TryGetValue(this Hashtable source, object key, out object value)
+        internal static bool TryGetValueFromHashtable(Hashtable source, object key, out object value)
         {
             value = null;
             Monitor.Enter(source);
@@ -383,7 +383,7 @@ namespace System
         /// <param name="key"></param>
         /// <param name="value"></param>
         /// <returns></returns>
-        internal static object GetOrAdd(this Hashtable source, object key, object value)
+        internal static object GetOrAddToHashtable(Hashtable source, object key, object value)
         {
             Monitor.Enter(source);
             try
@@ -403,7 +403,7 @@ namespace System
 
 
 
-#region Private Static Helper Methods
+        #region Private Static Helper Methods
 
         internal static class Helper
         {

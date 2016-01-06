@@ -391,8 +391,7 @@ namespace Emitter
             MessageHandler removed;
             this.TryRemove(CreateKey(channel), 0, out removed);
         }
-
-#if (MF_FRAMEWORK_VERSION_V4_2 || MF_FRAMEWORK_VERSION_V4_3)
+        
         /// <summary>
         /// Retrieves a set of values.
         /// </summary>
@@ -423,49 +422,15 @@ namespace Emitter
                 if (level >= query.Length)
                     break;
 
-                if (current.Children.TryGetValue("+", out childNode))
+                
+                if (Utils.TryGetValueFromHashtable(current.Children, "+", out childNode))
                     matches.Push(childNode);
-                if (current.Children.TryGetValue(query[level], out childNode))
+                if (Utils.TryGetValueFromHashtable(current.Children, query[level], out childNode))
                     matches.Push(childNode);
             }
 
             return result;
         }
-#else
-        /// <summary>
-        /// Retrieves a set of values.
-        /// </summary>
-        /// <param name="query">The query to retrieve.</param>
-        /// <param name="position">The position.</param>
-        /// <returns></returns>
-        public IEnumerable Match(string channel)
-        {
-            // Get the query
-            var query = CreateKey(channel);
-
-            // Get the matching stack
-            var matches = new Stack();
-
-            // Push the root
-            object childNode;
-            matches.Push(this);
-            while (matches.Count != 0)
-            {
-                var current = matches.Pop() as ReverseTrie;
-                if (current.Value != default(object))
-                    yield return current.Value;
-
-                var level = current.Level + 1;
-                if (level >= query.Length)
-                    break;
-
-                if (current.Children.TryGetValue("+", out childNode))
-                    matches.Push(childNode);
-                if (current.Children.TryGetValue(query[level], out childNode))
-                    matches.Push(childNode);
-            }
-        }
-#endif
 
         #region Private Members
         /// <summary>
@@ -499,9 +464,9 @@ namespace Emitter
                     return this.Value;
                 }
             }
-
+            
             // Create a child
-            var child = Children.GetOrAdd(key[position], new ReverseTrie((short)position)) as ReverseTrie;
+            var child = Utils.GetOrAddToHashtable(Children, key[position], new ReverseTrie((short)position)) as ReverseTrie;
             return child.AddOrUpdate(key, position + 1, addFunc, updateFunc);
         }
 
@@ -526,7 +491,7 @@ namespace Emitter
 
             // Remove from the child
             object child;
-            if (Children.TryGetValue(key[position], out child))
+            if (Utils.TryGetValueFromHashtable(Children, key[position], out child))
                 return ((ReverseTrie)child).TryRemove(key, position + 1, out value);
 
             value = default(MessageHandler);
