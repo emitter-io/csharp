@@ -25,7 +25,18 @@ namespace Emitter.Network
     {
     }
 
+    /// <summary>
+    /// Represents a untyped object stack.
+    /// </summary>
     public class Stack : Stack<object>
+    {
+
+    }
+
+    /// <summary>
+    /// Represents a heterogeneous list of objects.
+    /// </summary>
+    public class ArrayList : List<object>
     {
 
     }

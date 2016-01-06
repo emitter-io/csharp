@@ -29,7 +29,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>..\bin\Release\Emitter.WinRT\</OutputPath>
-    <DefineConstants>TRACE;WINDOWS_APP,WINDOWS_PHONE_APP,SSL</DefineConstants>
+    <DefineConstants>TRACE;WINDOWS_APP,WINDOWS_PHONE_APP,SSL,WINRT</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -72,6 +72,8 @@
     <Compile Include="Messages\MqttMsgUnsubscribe.cs" />
     <Compile Include="Messages\MqttMsgUnsubscribedEventArgs.cs" />
     <Compile Include="Messages\MqttMsgUnsubscribeEventArgs.cs" />
+    <Compile Include="Json\JsonParser.cs" />
+    <Compile Include="Json\JsonSerializer.cs" />
     <Compile Include="MqttClient.cs" />
     <Compile Include="MqttSecurity.cs" />
     <Compile Include="MqttSettings.cs" />
@@ -79,11 +81,11 @@
     <Compile Include="Emitter.cs" />
     <Compile Include="Session\MqttClientSession.cs" />
     <Compile Include="Session\MqttSession.cs" />
-    <Compile Include="Utility\QueueExtension.cs" />
+    <Compile Include="Utility\Extensions.cs" />
     <Compile Include="Utility\Trace.cs" />
     <Compile Include="WinRT\Fx.cs" />
     <Compile Include="WinRT\MqttNetworkChannel.cs" />
-    <Compile Include="WinRT\Hashtable.cs" />
+    <Compile Include="WinRT\Types.cs" />
     <Compile Include="WinRT\Queue.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />

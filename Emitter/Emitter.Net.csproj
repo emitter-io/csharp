@@ -52,6 +52,8 @@
     <Compile Include="Internal\InternalEvent.cs" />
     <Compile Include="Internal\MsgInternalEvent.cs" />
     <Compile Include="Internal\MsgPublishedInternalEvent.cs" />
+    <Compile Include="Json\JsonParser.cs" />
+    <Compile Include="Json\JsonSerializer.cs" />
     <Compile Include="Messages\MqttMsgBase.cs" />
     <Compile Include="Messages\MqttMsgConnack.cs" />
     <Compile Include="Messages\MqttMsgConnect.cs" />
@@ -84,7 +86,7 @@
     <Compile Include="Session\MqttClientSession.cs" />
     <Compile Include="Session\MqttSession.cs" />
     <Compile Include="Utility\Trace.cs" />
-    <Compile Include="Utility\QueueExtension.cs" />
+    <Compile Include="Utility\Extensions.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -61,6 +61,8 @@
     <Compile Include="Messages\MqttMsgUnsubscribe.cs" />
     <Compile Include="Messages\MqttMsgUnsubscribedEventArgs.cs" />
     <Compile Include="Messages\MqttMsgUnsubscribeEventArgs.cs" />
+        <Compile Include="Json\JsonParser.cs" />
+    <Compile Include="Json\JsonSerializer.cs" />
     <Compile Include="MqttClient.cs" />
     <Compile Include="MqttSecurity.cs" />
     <Compile Include="Net\Fx.cs" />
@@ -71,7 +73,7 @@
     <Compile Include="Session\MqttClientSession.cs" />
     <Compile Include="Session\MqttSession.cs" />
     <Compile Include="Utility\Trace.cs" />
-    <Compile Include="Utility\QueueExtension.cs" />
+    <Compile Include="Utility\Extensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.SPOT.Native">
