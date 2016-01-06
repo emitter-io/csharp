@@ -2,8 +2,8 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
     <metadata>
         <id>Emitter</id>
-        <version>1.0.0.0</version>
-        <title>Emitter.io Client Library for .Net Framework, .Net Micro Framework and WinRT</title>
+        <version>$version$</version>
+        <title>Emitter</title>
         <authors>Roman Atachiants, Paolo Patierno</authors>
         <owners>Roman Atachiants</owners>
         <licenseUrl>https://github.com/emitter-io/csharp/blob/master/LICENSE</licenseUrl>

@@ -24,6 +24,14 @@ This library provides a nicer MQTT interface fine-tuned and extended with specif
 * To build for .Net Micro Framework 4.2 or 4.3, you need to download .Net Micro Framework SDK from CodePlex: https://netmf.codeplex.com/
 * To build for .Net Micro Framework 4.4, you need to download .Net Micro Framework SDK from GitHub: https://github.com/NETMF/netmf-interpreter/releases
 
+# Nuget
+
+To install Emitter, run the following command in the [Package Manager Console](http://docs.nuget.org/consume/package-manager-console):
+
+```
+Install-Package Emitter
+```
+
 # Usage
 
 Below is a sample program written using this C# client library. This demonstrates a simple console chat app where the messages are published to `chat` channel and every connected client receives them in real-time.
