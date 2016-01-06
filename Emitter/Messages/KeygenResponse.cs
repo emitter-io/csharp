@@ -51,7 +51,7 @@ namespace Emitter.Messages
 
             response.Key = (string)map["key"];
             response.Channel = (string)map["channel"];
-            response.Status = Convert.ToInt32(map["status"]);
+            response.Status = Convert.ToInt32(map["status"].ToString());
             
             return response;
         }
