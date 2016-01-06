@@ -29,6 +29,10 @@ namespace Emitter
     /// </summary>
     public delegate void MessageHandler(string channel, byte[] message);
 
+    /// <summary>
+    /// Delegate that defines event handler for cliet/peer disconnection
+    /// </summary>
+    public delegate void DisconnectHandler(object sender, EventArgs e);
 
     /// <summary>
     /// Represents emitter.io MQTT-based client.
@@ -79,7 +83,10 @@ namespace Emitter
             this.TlsSecure = useTls;
             this.Client = new MqttClient(broker);
             this.Client.MqttMsgPublishReceived += OnMessageReceived;
+            this.Client.ConnectionClosed += OnDisconnect;
         }
+
+
         #endregion
 
         #region Static Members
@@ -90,6 +97,24 @@ namespace Emitter
         #endregion
 
         #region Connect / Disconnect Members
+
+        /// <summary>
+        /// Occurs when the client was disconnected.
+        /// </summary>
+        public event DisconnectHandler Disconnected;
+
+        /// <summary>
+        /// Occurs when the connection was closed.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnDisconnect(object sender, EventArgs e)
+        {
+            // Forward the event
+            if (this.Disconnected != null)
+                this.Disconnected(sender, e);
+        }
+
         /// <summary>
         /// Connects the emitter.io service.
         /// </summary>
