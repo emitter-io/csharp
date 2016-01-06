@@ -37,7 +37,7 @@ namespace Emitter
     /// <summary>
     /// Represents emitter.io MQTT-based client.
     /// </summary>
-    public class Connection
+    public class Connection : IDisposable
     {
         #region Constructors
         private const string NoDefaultKey = "The default key was not provided. Either provide a default key in the constructor or specify a key for the operation.";
@@ -50,26 +50,26 @@ namespace Emitter
         /// <summary>
         /// Constructs a new emitter.io connection.
         /// </summary>
-        public Connection() : this("api.emitter.io", null, false) { }
+        public Connection() : this(null, null, false) { }
 
         /// <summary>
         /// Constructs a new emitter.io connection.
         /// </summary>
         /// <param name="defaultKey">The default key to use.</param>
-        public Connection(string defaultKey) : this("api.emitter.io", defaultKey, false) { }
+        public Connection(string defaultKey) : this(null, defaultKey, false) { }
 
         /// <summary>
         /// Constructs a new emitter.io connection.
         /// </summary>
         /// <param name="useTls">Whether we should use TLS security.</param>
-        public Connection(bool useTls) : this("api.emitter.io", null, useTls) { }
+        public Connection(bool useTls) : this(null, null, useTls) { }
 
         /// <summary>
         /// Constructs a new emitter.io connection.
         /// </summary>
         /// <param name="defaultKey">The default key to use.</param>
         /// <param name="useTls">Whether we should use TLS security.</param>
-        public Connection(string defaultKey, bool useTls) : this("api.emitter.io", defaultKey, useTls) { }
+        public Connection(string defaultKey, bool useTls) : this(null, defaultKey, useTls) { }
 
         /// <summary>
         /// Constructs a new emitter.io connection.
@@ -79,6 +79,9 @@ namespace Emitter
         /// <param name="useTls">Whether we should use TLS security.</param>
         public Connection(string broker, string defaultKey, bool useTls)
         {
+            if (broker == null)
+                broker = "api.emitter.io";
+
             this.DefaultKey = defaultKey;
             this.TlsSecure = useTls;
             this.Client = new MqttClient(broker);
@@ -94,6 +97,57 @@ namespace Emitter
         /// Gets the default instance of the client.
         /// </summary>
         public static readonly Connection Default = new Connection();
+
+        
+        /// <summary>
+        /// Establishes a new connection by creating the connection instance and connecting to it.
+        /// </summary>
+        /// <returns>The connection state.</returns>
+        public static Connection Establish()
+        {
+            return Establish(null, null, false);
+        }
+
+        /// <summary>
+        /// Establishes a new connection by creating the connection instance and connecting to it.
+        /// </summary>
+        /// <param name="defaultKey">The default key to use.</param>
+        /// <returns>The connection state.</returns>
+        public static Connection Establish(string defaultKey)
+        {
+            return Establish(null, defaultKey, false);
+        }
+
+        /// <summary>
+        /// Establishes a new connection by creating the connection instance and connecting to it.
+        /// </summary>
+        /// <param name="broker">The broker hostname to use.</param>
+        /// <param name="defaultKey">The default key to use.</param>
+        /// <param name="useTls">Whether we should use TLS security.</param>
+        /// <returns>The connection state.</returns>
+        public static Connection Establish(string broker, string defaultKey)
+        {
+            return Establish(broker, defaultKey, false);
+        }
+
+        /// <summary>
+        /// Establishes a new connection by creating the connection instance and connecting to it.
+        /// </summary>
+        /// <param name="broker">The broker hostname to use.</param>
+        /// <param name="defaultKey">The default key to use.</param>
+        /// <param name="useTls">Whether we should use TLS security.</param>
+        /// <returns>The connection state.</returns>
+        public static Connection Establish(string broker, string defaultKey, bool useTls)
+        {
+            // Create the connection
+            var conn = new Connection(broker, defaultKey, useTls);
+
+            // Connect
+            conn.Connect();
+
+            // Return it
+            return conn;
+        }
         #endregion
 
         #region Connect / Disconnect Members
@@ -346,6 +400,40 @@ namespace Emitter
 
             // We're done compiling the channel name
             return formatted;
+        }
+
+
+        #endregion
+
+        #region IDisposable
+        /// <summary>
+        /// Disposes the connection.
+        /// </summary>
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Disposes the connection.
+        /// </summary>
+        /// <param name="disposing">Whether we are disposing or finalizing.</param>
+        protected void Dispose(bool disposing)
+        {
+            try
+            {
+                this.Disconnect();
+            }
+            catch { }
+        }
+
+        /// <summary>
+        /// Finalizes the connection.
+        /// </summary>
+        ~Connection()
+        {
+            this.Dispose(false);
         }
         #endregion
     }
