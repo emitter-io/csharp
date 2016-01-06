@@ -16,6 +16,8 @@
         <tags>emitter mqtt queue messaging pubsub publish subscribe internetofthings iot cloud netmf embedded micro netduino micro-framework hardware winrt windows8 windows8.1 windowsphone windowsphone8.1 gadgeteer</tags>
     </metadata>
     <files>
+      <file src="bin\Release\Emitter.Net45\*.*" target="lib\net35" />
+      <file src="bin\Release\Emitter.Net45\*.*" target="lib\net40" />
       <file src="bin\Release\Emitter.Net45\*.*" target="lib\net45" />
       <file src="bin\Release\Emitter.Net451\*.*" target="lib\net451" />
       <file src="bin\Release\Emitter.Net452\*.*" target="lib\net452" />

@@ -441,10 +441,12 @@ namespace Emitter
                     return SslProtocols.Ssl3;
                 case MqttSslProtocols.TLSv1_0:
                     return SslProtocols.Tls;
+#if !NO_TLS_1_1
                 case MqttSslProtocols.TLSv1_1:
                     return SslProtocols.Tls11;
                 case MqttSslProtocols.TLSv1_2:
                     return SslProtocols.Tls12;
+#endif
                 default:
                     throw new ArgumentException("SSL/TLS protocol version not supported");
             }
