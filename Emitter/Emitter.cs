@@ -378,7 +378,7 @@ namespace Emitter
         private string FormatChannel(string key, string channel, params Option[] options)
         {
             // Prefix with the key
-            var formatted = channel.EndsWith("/")
+            var formatted = key.EndsWith("/")
                 ? key + channel
                 : key + "/" + channel;
 
