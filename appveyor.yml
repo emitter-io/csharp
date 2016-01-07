@@ -20,7 +20,7 @@ install:
 before_build:
   - ps: .\Deploy\install-fxmicroframework-43-44.ps1
 
-build:
+build_script:
   - cmd: build-release.cmd
 
 after_test:
