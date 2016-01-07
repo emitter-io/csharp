@@ -1,9 +1,10 @@
 # Emitter C# SDK
 
-![](Emitter.png)
+![](http://emitter.io/content/img/home/universal.png)
 
+![](https://img.shields.io/nuget/dt/Emitter.svg) ![](https://ci.appveyor.com/api/projects/status/9ij53wljl656lnfr?svg=true)
 
-Emitter is an MQTT client tailored for [emitter.io](http://emitter.io) service, allowing real-time publish subscribe. It supports full .Net Framework, .Net Micro Framework and WinRT platform.
+Emitter is a cost-effective real-time messaging service for connecting online devices. Its publish-subscribe messaging API is built for speed and security. This repository contains the client SDK built on top of an MQTT client for [emitter.io](http://emitter.io) service, allowing real-time publish subscribe. It supports full .Net Framework, .Net Micro Framework and WinRT platform.
 
 The current version supports several .Net Frameworks: 
 
@@ -21,8 +22,13 @@ This library provides a nicer MQTT interface fine-tuned and extended with specif
 ) written by [Paolo Patierno](https://m2mqtt.wordpress.com/who/) and released under Eclipse Public License.
 
 # Build Notes
+The solution contains C# projects for Micro Framework.
 * To build for .Net Micro Framework 4.2 or 4.3, you need to download .Net Micro Framework SDK from CodePlex: https://netmf.codeplex.com/
 * To build for .Net Micro Framework 4.4, you need to download .Net Micro Framework SDK from GitHub: https://github.com/NETMF/netmf-interpreter/releases
+
+Alternatively, the files can be downloaded from here:
+* [.Net MicroFramework 4.2 & 4.3](https://s3.amazonaws.com/cdn.misakai.com/www-lib/MicroFramework4.3.msi)
+* [.Net MicroFramework 4.4](https://s3.amazonaws.com/cdn.misakai.com/www-lib/MicroFramework4.4.msi)
 
 # Nuget
 
