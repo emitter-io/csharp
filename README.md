@@ -7,7 +7,7 @@ Emitter is an MQTT client tailored for [emitter.io](http://emitter.io) service, 
 
 The current version supports several .Net Frameworks: 
 
-* .Net Framework (4.5+)
+* .Net Framework (2.0, 3.0, 3.5, 4.0, 4.5, 4.5.1, 4.5.2, 4.6, 4.6.1)
 * .Net Micro Framework 4.2, 4.3 and 4.4
 * Mono (for Linux O.S.)
 
