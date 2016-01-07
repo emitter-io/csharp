@@ -21,7 +21,7 @@ before_build:
   - ps: .\Deploy\install-fxmicroframework-43-44.ps1
 
 build:
-  project: Emitter.sln
+  - cmd: build-release.cmd
 
 after_test:
   - ps: .\Deploy\pack.ps1  
