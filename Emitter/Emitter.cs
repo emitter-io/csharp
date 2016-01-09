@@ -15,6 +15,7 @@ Contributors:
 using System;
 using System.Collections;
 using System.Text;
+
 using Emitter.Messages;
 using Emitter.Utility;
 #if (MF_FRAMEWORK_VERSION_V4_2 || MF_FRAMEWORK_VERSION_V4_3)
@@ -35,13 +36,16 @@ namespace Emitter
     public delegate void DisconnectHandler(object sender, EventArgs e);
 
     /// <summary>
+    /// Delegate that defines an event handler for an error.
+    /// </summary>
+    public delegate void ErrorHandler(object sender, Exception e);
+
+    /// <summary>
     /// Represents emitter.io MQTT-based client.
     /// </summary>
     public class Connection : IDisposable
     {
         #region Constructors
-        private const string NoDefaultKey = "The default key was not provided. Either provide a default key in the constructor or specify a key for the operation.";
-
         private readonly MqttClient Client;
         private readonly ReverseTrie Trie = new ReverseTrie(-1);
         private bool TlsSecure = false;
@@ -90,6 +94,35 @@ namespace Emitter
         }
 
 
+        #endregion
+
+        #region Error Members
+        /// <summary>
+        /// Occurs when an error occurs.
+        /// </summary>
+        public event ErrorHandler Error;
+
+        /// <summary>
+        /// Invokes the error handler.
+        /// </summary>
+        /// <param name="ex"></param>
+        private void InvokeError(Exception ex)
+        {
+            if (this.Error != null)
+                this.Error(this, ex);
+        }
+
+        /// <summary>
+        /// Invokes the error handler.
+        /// </summary>
+        /// <param name="status"></param>
+        private void InvokeError(int status)
+        {
+            if (status == 200)
+                return;
+
+            InvokeError(EmitterException.FromStatus(status));
+        }
         #endregion
 
         #region Static Members
@@ -197,7 +230,7 @@ namespace Emitter
         public ushort On(string channel, MessageHandler handler)
         {
             if (this.DefaultKey == null)
-                throw new ArgumentNullException(NoDefaultKey);
+                throw EmitterException.NoDefaultKey;
             return this.On(this.DefaultKey, channel, handler);
         }
 
@@ -226,7 +259,7 @@ namespace Emitter
         public ushort Unsubscribe(string channel)
         {
             if (this.DefaultKey == null)
-                throw new ArgumentNullException(NoDefaultKey);
+                throw EmitterException.NoDefaultKey;
             return this.Unsubscribe(this.DefaultKey, channel);
         }
 
@@ -257,7 +290,7 @@ namespace Emitter
         public ushort Publish(string channel, byte[] message)
         {
             if (this.DefaultKey == null)
-                throw new ArgumentNullException(NoDefaultKey);
+                throw EmitterException.NoDefaultKey;
             return this.Publish(this.DefaultKey, channel, message);
         }
 
@@ -271,7 +304,7 @@ namespace Emitter
         public ushort Publish(string channel, string message)
         {
             if (this.DefaultKey == null)
-                throw new ArgumentNullException(NoDefaultKey);
+                throw EmitterException.NoDefaultKey;
             return this.Publish(this.DefaultKey, channel, Encoding.UTF8.GetBytes(message));
         }
 
@@ -349,18 +382,28 @@ namespace Emitter
         /// <param name="e"></param>
         private void OnMessageReceived(object sender, Messages.MqttMsgPublishEventArgs e)
         {
-            // Did we receive a keygen response?
-            if(e.Topic == "emitter/keygen/")
+            try
             {
-                // Deserialize the response
-                var response = KeygenResponse.FromBinary(e.Message);
-                if (response == null || response.Status != 200)
-                    return; // TODO: Log this
-
-                // Call the response handler we have registered previously
-                if (this.KeygenHandlers.ContainsKey(response.Channel))
-                    ((KeygenHandler)this.KeygenHandlers[response.Channel])(response);
-                return;
+                // Did we receive a keygen response?
+                if (e.Topic == "emitter/keygen/")
+                {
+                    // Deserialize the response
+                    var response = KeygenResponse.FromBinary(e.Message);
+                    if (response == null || response.Status != 200)
+                    {
+                        this.InvokeError(response.Status);
+                        return;
+                    }
+                        
+                    // Call the response handler we have registered previously
+                    if (this.KeygenHandlers.ContainsKey(response.Channel))
+                        ((KeygenHandler)this.KeygenHandlers[response.Channel])(response);
+                    return;
+                }
+            }
+            catch(Exception ex)
+            {
+                this.InvokeError(ex);
             }
 
             // Invoke every handler matching the channel

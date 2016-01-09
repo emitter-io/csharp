@@ -22,7 +22,7 @@ using System.Collections.Generic;
 #endif
 using System.Collections;
 using System.Text;
-using Emitter.Exceptions;
+
 
 namespace Emitter.Messages
 {

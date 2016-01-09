@@ -22,7 +22,6 @@ using System.Net.Sockets;
 using System.Security.Cryptography.X509Certificates;
 #endif
 using System.Threading;
-using Emitter.Exceptions;
 using Emitter.Messages;
 using Emitter.Session;
 using Emitter.Utility;

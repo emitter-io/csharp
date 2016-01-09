@@ -14,9 +14,6 @@ Contributors:
    Roman Atachiants - integrating with emitter.io
 */
 
-
-using Emitter.Exceptions;
-
 namespace Emitter.Messages
 {
     /// <summary>

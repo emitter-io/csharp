@@ -16,7 +16,7 @@ Contributors:
 
 
 using System;
-using Emitter.Exceptions;
+
 
 namespace Emitter.Messages
 {

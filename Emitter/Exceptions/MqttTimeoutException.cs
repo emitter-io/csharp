@@ -17,12 +17,14 @@ Contributors:
 
 using System;
 
-namespace Emitter.Exceptions
+namespace Emitter
 {
+
     /// <summary>
     /// Timeout on receiving from broker exception
     /// </summary>
     public class MqttTimeoutException : Exception
     {
     }
+
 }
