@@ -191,6 +191,14 @@ namespace Emitter
         public event DisconnectHandler Disconnected;
 
         /// <summary>
+        /// Gets whether the client is connected or not.
+        /// </summary>
+        public bool IsConnected
+        {
+            get { return this.Client.IsConnected; }
+        }
+
+        /// <summary>
         /// Occurs when the connection was closed.
         /// </summary>
         /// <param name="sender"></param>
@@ -368,6 +376,8 @@ namespace Emitter
 
             // Register the handler
             this.KeygenHandlers[channel] = handler;
+
+            //this.Client.Subscribe(new string[] { "emitter/keygen/" }, new byte[] { 0 });
 
             // Serialize and publish the request
             this.Publish("emitter/", "keygen/", Encoding.UTF8.GetBytes(request.ToJson()));

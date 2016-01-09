@@ -280,11 +280,9 @@ namespace Emitter
                 this.sslStream.Flush();
                 return buffer.Length;
             }
-            else
-                return this.socket.Send(buffer, 0, buffer.Length, SocketFlags.None);
-#else
-            return this.socket.Send(buffer, 0, buffer.Length, SocketFlags.None);
 #endif
+
+            return this.socket.Send(buffer, 0, buffer.Length, SocketFlags.None);
         }
 
         /// <summary>
