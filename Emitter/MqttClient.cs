@@ -657,7 +657,7 @@ namespace Emitter
             {
                 this.isConnectionClosing = true;
                 this.receiveEventWaitHandle.Set();
-
+                
                 // If not connected ensure that all actions are stopped,
                 // otherwise close will not be called because a the DispatchThread is not running
                 if (!this.IsConnected)
