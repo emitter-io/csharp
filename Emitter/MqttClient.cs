@@ -495,8 +495,11 @@ namespace Emitter
         /// </summary>
         public void Disconnect()
         {
-            MqttMsgDisconnect disconnect = new MqttMsgDisconnect();
-            this.Send(disconnect);
+            if (this.IsConnected)
+            {
+                MqttMsgDisconnect disconnect = new MqttMsgDisconnect();
+                this.Send(disconnect);
+            }
 
             // close client
             this.OnConnectionClosing();
@@ -654,6 +657,11 @@ namespace Emitter
             {
                 this.isConnectionClosing = true;
                 this.receiveEventWaitHandle.Set();
+
+                // If not connected ensure that all actions are stopped,
+                // otherwise close will not be called because a the DispatchThread is not running
+                if (!this.IsConnected)
+                    this.Close();
             }
         }
 
