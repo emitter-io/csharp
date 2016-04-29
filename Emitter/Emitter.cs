@@ -48,47 +48,34 @@ namespace Emitter
         #region Constructors
         private readonly MqttClient Client;
         private readonly ReverseTrie Trie = new ReverseTrie(-1);
-        private bool TlsSecure = false;
         private string DefaultKey = null;
 
         /// <summary>
         /// Constructs a new emitter.io connection.
         /// </summary>
-        public Connection() : this(null, null, false) { }
+        public Connection() : this(null, 0, null) { }
 
         /// <summary>
         /// Constructs a new emitter.io connection.
         /// </summary>
         /// <param name="defaultKey">The default key to use.</param>
-        public Connection(string defaultKey) : this(null, defaultKey, false) { }
-
-        /// <summary>
-        /// Constructs a new emitter.io connection.
-        /// </summary>
-        /// <param name="useTls">Whether we should use TLS security.</param>
-        public Connection(bool useTls) : this(null, null, useTls) { }
-
-        /// <summary>
-        /// Constructs a new emitter.io connection.
-        /// </summary>
-        /// <param name="defaultKey">The default key to use.</param>
-        /// <param name="useTls">Whether we should use TLS security.</param>
-        public Connection(string defaultKey, bool useTls) : this(null, defaultKey, useTls) { }
-
+        public Connection(string defaultKey) : this(null, 0, defaultKey) { }
+        
         /// <summary>
         /// Constructs a new emitter.io connection.
         /// </summary>
         /// <param name="broker">The broker hostname to use.</param>
         /// <param name="defaultKey">The default key to use.</param>
         /// <param name="useTls">Whether we should use TLS security.</param>
-        public Connection(string broker, string defaultKey, bool useTls)
+        public Connection(string broker, int brokerPort, string defaultKey)
         {
             if (broker == null)
                 broker = "api.emitter.io";
+            if (brokerPort <= 0)
+                brokerPort = MqttSettings.MQTT_BROKER_DEFAULT_PORT;
 
             this.DefaultKey = defaultKey;
-            this.TlsSecure = useTls;
-            this.Client = new MqttClient(broker);
+            this.Client = new MqttClient(broker, brokerPort);
             this.Client.MqttMsgPublishReceived += OnMessageReceived;
             this.Client.ConnectionClosed += OnDisconnect;
         }
@@ -138,7 +125,7 @@ namespace Emitter
         /// <returns>The connection state.</returns>
         public static Connection Establish()
         {
-            return Establish(null, null, false);
+            return Establish(null, 0, null);
         }
 
         /// <summary>
@@ -148,32 +135,20 @@ namespace Emitter
         /// <returns>The connection state.</returns>
         public static Connection Establish(string defaultKey)
         {
-            return Establish(null, defaultKey, false);
+            return Establish(null, 0, defaultKey);
         }
-
+        
         /// <summary>
         /// Establishes a new connection by creating the connection instance and connecting to it.
         /// </summary>
-        /// <param name="broker">The broker hostname to use.</param>
+        /// <param name="brokerHostName">The broker hostname to use.</param>
         /// <param name="defaultKey">The default key to use.</param>
         /// <param name="useTls">Whether we should use TLS security.</param>
         /// <returns>The connection state.</returns>
-        public static Connection Establish(string broker, string defaultKey)
-        {
-            return Establish(broker, defaultKey, false);
-        }
-
-        /// <summary>
-        /// Establishes a new connection by creating the connection instance and connecting to it.
-        /// </summary>
-        /// <param name="broker">The broker hostname to use.</param>
-        /// <param name="defaultKey">The default key to use.</param>
-        /// <param name="useTls">Whether we should use TLS security.</param>
-        /// <returns>The connection state.</returns>
-        public static Connection Establish(string broker, string defaultKey, bool useTls)
+        public static Connection Establish(string brokerHostName, int brokerPort, string defaultKey)
         {
             // Create the connection
-            var conn = new Connection(broker, defaultKey, useTls);
+            var conn = new Connection(brokerHostName, brokerPort, defaultKey);
 
             // Connect
             conn.Connect();
