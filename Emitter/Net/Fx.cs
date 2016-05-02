@@ -26,7 +26,12 @@ namespace Emitter
     {
         public static void StartThread(ThreadStart threadStart)
         {
-            new Thread(threadStart).Start();
+            var thread = new Thread(threadStart);
+            #if !(MF_FRAMEWORK_VERSION_V4_2 || MF_FRAMEWORK_VERSION_V4_3 || MF_FRAMEWORK_VERSION_V4_4)
+            thread.IsBackground = true;
+            #endif
+
+            thread.Start();
         }
 
         public static void SleepThread(int millisecondsTimeout)
