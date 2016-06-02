@@ -234,6 +234,24 @@ namespace Emitter
         }
 
         /// <summary>
+        /// Asynchronously subscribes to a particular channel of emitter.io service.
+        /// </summary>
+        /// <param name="key">The key to use for this subscription request.</param>
+        /// <param name="channel">The channel to subscribe to.</param>
+        /// <param name="handler">The callback to be invoked every time the message is received.</param>
+        /// <param name="last">The last x messages to request when we subcribe.</param>
+        /// <returns>The message identifier for this operation.</returns>
+        public ushort On(string key, string channel, MessageHandler handler, int last)
+        {
+            // Register the handler
+            this.Trie.RegisterHandler(channel, handler);
+
+            // Subscribe
+            return this.Client.Subscribe(new string[] { FormatChannel(key, channel, new Option("last", last.ToString())) }, new byte[] { MqttMsgBase.QOS_LEVEL_AT_MOST_ONCE });
+        }
+
+
+        /// <summary>
         /// Asynchonously unsubscribes from a particular channel of emitter.io service. Uses the default
         /// key that should be specified in the constructor.
         /// </summary>
@@ -313,6 +331,32 @@ namespace Emitter
         public ushort Publish(string key, string channel, byte[] message)
         {
             return this.Client.Publish(FormatChannel(key, channel), message);
+        }
+
+        /// <summary>
+        /// Publishes a message to the emitter.io service asynchronously.
+        /// </summary>
+        /// <param name="key">The key to use for this publish request.</param>
+        /// <param name="channel">The channel to publish to.</param>
+        /// <param name="message">The message body to send.</param>
+        /// <param name="ttl">The time to live of the message.</param>
+        /// <returns>The message identifier.</returns>
+        public ushort Publish(string key, string channel, string message, int ttl)
+        {
+            return this.Client.Publish(FormatChannel(key, channel, new Option("ttl", ttl.ToString())), Encoding.UTF8.GetBytes(message));
+        }
+
+        /// <summary>
+        /// Publishes a message to the emitter.io service asynchronously.
+        /// </summary>
+        /// <param name="key">The key to use for this publish request.</param>
+        /// <param name="channel">The channel to publish to.</param>
+        /// <param name="message">The message body to send.</param>
+        /// <param name="ttl">The time to live of the message.</param>
+        /// <returns>The message identifier.</returns>
+        public ushort Publish(string key, string channel, byte[] message, int ttl)
+        {
+            return this.Client.Publish(FormatChannel(key, channel, new Option("ttl", ttl.ToString())), message);
         }
         #endregion
 
