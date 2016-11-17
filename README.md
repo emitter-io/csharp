@@ -1,10 +1,8 @@
 # Emitter C# SDK
 
-![](http://emitter.io/content/img/home/universal.png)
+This repository contains C# client for .Net Framework, .Net Micro Framework and WinRT for [Emitter](https://emitter.io) (see also on [Emitter GitHub](https://github.com/emitter-io/emitter)). Emitter is an **open-source** real-time communication service for connecting online devices. At its core, emitter.io is a distributed, scalable and fault-tolerant publish-subscribe messaging platform based on MQTT protocol and featuring message storage.
 
 ![](https://img.shields.io/nuget/dt/Emitter.svg) ![](https://ci.appveyor.com/api/projects/status/9ij53wljl656lnfr?svg=true)
-
-Emitter is a cost-effective real-time messaging service for connecting online devices. Its publish-subscribe messaging API is built for speed and security. This repository contains the client SDK built on top of an MQTT client for [emitter.io](http://emitter.io) service, allowing real-time publish subscribe. It supports full .Net Framework, .Net Micro Framework and WinRT platform.
 
 The current version supports several .Net Frameworks: 
 
