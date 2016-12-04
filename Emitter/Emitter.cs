@@ -3,7 +3,7 @@ Copyright (c) 2016 Roman Atachiants
 
 All rights reserved. This program and the accompanying materials
 are made available under the terms of the Eclipse Public License v1.0
-and Eclipse Distribution License v1.0 which accompany this distribution. 
+and Eclipse Distribution License v1.0 which accompany this distribution.
 
 The Eclipse Public License:  http://www.eclipse.org/legal/epl-v10.html
 The Eclipse Distribution License: http://www.eclipse.org/org/documents/edl-v10.php.
@@ -17,11 +17,12 @@ using System.Collections;
 using System.Text;
 
 using Emitter.Messages;
-using Emitter.Utility;
-#if (MF_FRAMEWORK_VERSION_V4_2 || MF_FRAMEWORK_VERSION_V4_3)
-using Microsoft.SPOT;
-#endif
 
+#if (MF_FRAMEWORK_VERSION_V4_2 || MF_FRAMEWORK_VERSION_V4_3)
+
+using Microsoft.SPOT;
+
+#endif
 
 namespace Emitter
 {
@@ -60,7 +61,7 @@ namespace Emitter
         /// </summary>
         /// <param name="defaultKey">The default key to use.</param>
         public Connection(string defaultKey) : this(null, 0, defaultKey) { }
-        
+
         /// <summary>
         /// Constructs a new emitter.io connection.
         /// </summary>
@@ -80,10 +81,10 @@ namespace Emitter
             this.Client.ConnectionClosed += OnDisconnect;
         }
 
-
-        #endregion
+        #endregion Constructors
 
         #region Error Members
+
         /// <summary>
         /// Occurs when an error occurs.
         /// </summary>
@@ -110,15 +111,16 @@ namespace Emitter
 
             InvokeError(EmitterException.FromStatus(status));
         }
-        #endregion
+
+        #endregion Error Members
 
         #region Static Members
+
         /// <summary>
         /// Gets the default instance of the client.
         /// </summary>
         public static readonly Connection Default = new Connection();
 
-        
         /// <summary>
         /// Establishes a new connection by creating the connection instance and connecting to it.
         /// </summary>
@@ -137,7 +139,7 @@ namespace Emitter
         {
             return Establish(null, 0, defaultKey);
         }
-        
+
         /// <summary>
         /// Establishes a new connection by creating the connection instance and connecting to it.
         /// </summary>
@@ -156,7 +158,8 @@ namespace Emitter
             // Return it
             return conn;
         }
-        #endregion
+
+        #endregion Static Members
 
         #region Connect / Disconnect Members
 
@@ -192,7 +195,7 @@ namespace Emitter
         {
             var connack = this.Client.Connect(Guid.NewGuid().ToString());
         }
-        
+
         /// <summary>
         /// Disconnects from emitter.io service.
         /// </summary>
@@ -200,9 +203,11 @@ namespace Emitter
         {
             this.Client.Disconnect();
         }
-        #endregion
+
+        #endregion Connect / Disconnect Members
 
         #region Subscribe / Unsubscribe Members
+
         /// <summary>
         /// Asynchronously subscribes to a particular channel of emitter.io service. Uses the default
         /// key that should be specified in the constructor.
@@ -250,7 +255,6 @@ namespace Emitter
             return this.Client.Subscribe(new string[] { FormatChannel(key, channel, new Option("last", last.ToString())) }, new byte[] { MqttMsgBase.QOS_LEVEL_AT_MOST_ONCE });
         }
 
-
         /// <summary>
         /// Asynchonously unsubscribes from a particular channel of emitter.io service. Uses the default
         /// key that should be specified in the constructor.
@@ -276,11 +280,13 @@ namespace Emitter
             this.Trie.UnregisterHandler(key);
 
             // Unsubscribe
-            return this.Client.Unsubscribe(new string[] { FormatChannel( key, channel) });
+            return this.Client.Unsubscribe(new string[] { FormatChannel(key, channel) });
         }
-        #endregion
+
+        #endregion Subscribe / Unsubscribe Members
 
         #region Publish Members
+
         /// <summary>
         /// Asynchonously publishes a message to the emitter.io service. Uses the default
         /// key that should be specified in the constructor.
@@ -358,9 +364,11 @@ namespace Emitter
         {
             return this.Client.Publish(FormatChannel(key, channel, new Option("ttl", ttl.ToString())), message);
         }
-        #endregion
+
+        #endregion Publish Members
 
         #region KeyGen Members
+
         /// <summary>
         /// Hashtable used for processing keygen responses.
         /// </summary>
@@ -401,9 +409,11 @@ namespace Emitter
             // Serialize and publish the request
             this.Publish("emitter/", "keygen/", Encoding.UTF8.GetBytes(request.ToJson()));
         }
-        #endregion
+
+        #endregion KeyGen Members
 
         #region Private Members
+
         /// <summary>
         /// Occurs when a message is received.
         /// </summary>
@@ -423,14 +433,14 @@ namespace Emitter
                         this.InvokeError(response.Status);
                         return;
                     }
-                        
+
                     // Call the response handler we have registered previously
                     if (this.KeygenHandlers.ContainsKey(response.Channel))
                         ((KeygenHandler)this.KeygenHandlers[response.Channel])(response);
                     return;
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 this.InvokeError(ex);
             }
@@ -462,7 +472,7 @@ namespace Emitter
             if (options != null && options.Length > 0)
             {
                 formatted += "?";
-                for (int i=0; i < options.Length; ++i)
+                for (int i = 0; i < options.Length; ++i)
                 {
                     formatted += options[i].Key + "=" + options[i].Value;
                     if (i + 1 < options.Length)
@@ -474,10 +484,10 @@ namespace Emitter
             return formatted;
         }
 
-
-        #endregion
+        #endregion Private Members
 
         #region IDisposable
+
         /// <summary>
         /// Disposes the connection.
         /// </summary>
@@ -507,10 +517,12 @@ namespace Emitter
         {
             this.Dispose(false);
         }
-        #endregion
+
+        #endregion IDisposable
     }
 
     #region ReverseTrie
+
     /// <summary>
     /// Represents a trie with a reverse-pattern search.
     /// </summary>
@@ -551,7 +563,7 @@ namespace Emitter
             MessageHandler removed;
             this.TryRemove(CreateKey(channel), 0, out removed);
         }
-        
+
         /// <summary>
         /// Retrieves a set of values.
         /// </summary>
@@ -582,7 +594,6 @@ namespace Emitter
                 if (level >= query.Length)
                     break;
 
-                
                 if (Utils.TryGetValueFromHashtable(current.Children, "+", out childNode))
                     matches.Push(childNode);
                 if (Utils.TryGetValueFromHashtable(current.Children, query[level], out childNode))
@@ -593,6 +604,7 @@ namespace Emitter
         }
 
         #region Private Members
+
         /// <summary>
         /// Creates a query for the trie from the channel name.
         /// </summary>
@@ -624,7 +636,7 @@ namespace Emitter
                     return this.Value;
                 }
             }
-            
+
             // Create a child
             var child = Utils.GetOrAddToHashtable(Children, key[position], new ReverseTrie((short)position)) as ReverseTrie;
             return child.AddOrUpdate(key, position + 1, addFunc, updateFunc);
@@ -657,7 +669,9 @@ namespace Emitter
             value = default(MessageHandler);
             return false;
         }
-#endregion
+
+        #endregion Private Members
     }
-#endregion
+
+    #endregion ReverseTrie
 }

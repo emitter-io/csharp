@@ -28,7 +28,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>..\bin\Release\Emitter.Net451\</OutputPath>
-    <DefineConstants>TRACE;SSL</DefineConstants>
+    <DefineConstants>TRACE;SSL;FX</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>

@@ -4,7 +4,7 @@ Copyright (c) 2013, 2014 Paolo Patierno
 
 All rights reserved. This program and the accompanying materials
 are made available under the terms of the Eclipse Public License v1.0
-and Eclipse Distribution License v1.0 which accompany this distribution. 
+and Eclipse Distribution License v1.0 which accompany this distribution.
 
 The Eclipse Public License:  http://www.eclipse.org/legal/epl-v10.html
 The Eclipse Distribution License: http://www.eclipse.org/org/documents/edl-v10.php.
@@ -14,6 +14,7 @@ Contributors:
    Roman Atachiants - integrating with emitter.io
 */
 
+#if (FX || MF)
 
 using System.Threading;
 
@@ -27,9 +28,9 @@ namespace Emitter
         public static void StartThread(ThreadStart threadStart)
         {
             var thread = new Thread(threadStart);
-            #if !(MF_FRAMEWORK_VERSION_V4_2 || MF_FRAMEWORK_VERSION_V4_3 || MF_FRAMEWORK_VERSION_V4_4)
+#if !MF
             thread.IsBackground = true;
-            #endif
+#endif
 
             thread.Start();
         }
@@ -40,3 +41,5 @@ namespace Emitter
         }
     }
 }
+
+#endif

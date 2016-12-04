@@ -24,7 +24,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>..\bin\Release\Emitter.NetMf42\</OutputPath>
-    <DefineConstants>TRACE,MF_FRAMEWORK_VERSION_V4_2,SSL</DefineConstants>
+    <DefineConstants>TRACE,MF_FRAMEWORK_VERSION_V4_2,SSL,MF_FRAMEWORK_VERSION_V4_2,MF</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -38,7 +38,7 @@
     <Compile Include="Internal\InternalEvent.cs" />
     <Compile Include="Internal\MsgInternalEvent.cs" />
     <Compile Include="Internal\MsgPublishedInternalEvent.cs" />
-        <Compile Include="Messages\KeygenResponse.cs" />
+    <Compile Include="Messages\KeygenResponse.cs" />
     <Compile Include="Messages\KeygenRequest.cs" />
     <Compile Include="Messages\MqttMsgBase.cs" />
     <Compile Include="Messages\MqttMsgConnack.cs" />
@@ -63,7 +63,7 @@
     <Compile Include="Messages\MqttMsgUnsubscribe.cs" />
     <Compile Include="Messages\MqttMsgUnsubscribedEventArgs.cs" />
     <Compile Include="Messages\MqttMsgUnsubscribeEventArgs.cs" />
-        <Compile Include="Json\JsonParser.cs" />
+    <Compile Include="Json\JsonParser.cs" />
     <Compile Include="Json\JsonSerializer.cs" />
     <Compile Include="MqttClient.cs" />
     <Compile Include="MqttSecurity.cs" />

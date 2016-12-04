@@ -4,7 +4,7 @@ Copyright (c) 2013, 2014 Paolo Patierno
 
 All rights reserved. This program and the accompanying materials
 are made available under the terms of the Eclipse Public License v1.0
-and Eclipse Distribution License v1.0 which accompany this distribution. 
+and Eclipse Distribution License v1.0 which accompany this distribution.
 
 The Eclipse Public License:  http://www.eclipse.org/legal/epl-v10.html
 The Eclipse Distribution License: http://www.eclipse.org/org/documents/edl-v10.php.
@@ -18,12 +18,15 @@ using System.Collections;
 using System.Globalization;
 using System.Threading;
 using Emitter;
-#if (MF_FRAMEWORK_VERSION_V4_2 || MF_FRAMEWORK_VERSION_V4_3)
+
+#if (MF)
 using Microsoft.SPOT;
 #endif
 #if WINRT
+
 using System.Linq;
 using System.Reflection;
+
 #endif
 
 namespace System
@@ -56,8 +59,8 @@ namespace System
             return null;
         }
 
-
 #if WINRT
+
         /// <summary>
         /// Gets the methods from the type.
         /// </summary>
@@ -67,8 +70,8 @@ namespace System
         {
             return type.GetTypeInfo().DeclaredMethods.ToArray();
         }
-#endif
 
+#endif
 
 #if MF_FRAMEWORK_VERSION_V4_2 || MF_FRAMEWORK_VERSION_V4_3
         /// <summary>
@@ -81,7 +84,7 @@ namespace System
         {
             return source.Contains(key);
         }
-        
+
         /// <summary>
         /// Determines whether the end of this string instance matches the specified string.
         /// </summary>
@@ -116,6 +119,7 @@ namespace System
             return s.IndexOf(value) >= 0;
         }
 #endif
+
         /// <summary>
         /// Attempts to parse a number into a Uint32
         /// </summary>
@@ -146,8 +150,7 @@ namespace System
             return c.ToString();
         }
 
-        
-		public static long ParseInt64(string str)
+        public static long ParseInt64(string str)
         {
             long result;
             if (TryParseInt64(str, out result))
@@ -296,7 +299,6 @@ namespace System
             }
 
             return value.ToString();
-
         }
 
         /// <summary>
@@ -344,7 +346,6 @@ namespace System
             return new DateTime(ticks, DateTimeKind.Utc);
         }
 
-
         /// <summary>
         /// Attempts to fetch a value.
         /// </summary>
@@ -365,7 +366,7 @@ namespace System
                 value = source[key];
                 return true;
             }
-            catch(Exception)
+            catch (Exception)
             {
                 return false;
             }
@@ -400,8 +401,6 @@ namespace System
                 Monitor.Exit(source);
             }
         }
-
-
 
         #region Private Static Helper Methods
 
@@ -488,7 +487,7 @@ namespace System
                 ulong tempa, tempb;
                 if (parseHex)
                 {
-#region Parse a hexadecimal value.
+                    #region Parse a hexadecimal value.
                     do
                     {
                         // Get the next digit from the string.
@@ -539,11 +538,11 @@ namespace System
                         }
                         ++posn; // Advance to the next character.
                     } while (posn < len);
-#endregion
+                    #endregion Parse a hexadecimal value.
                 }
                 else
                 {
-#region Parse a decimal value.
+                    #region Parse a decimal value.
                     do
                     {
                         // Get the next digit from the string.
@@ -592,7 +591,7 @@ namespace System
                         }
                         ++posn;// Advance to the next character.
                     } while (posn < len);
-#endregion
+                    #endregion Parse a decimal value.
                 }
 
                 // Process trailing white space.
@@ -619,10 +618,11 @@ namespace System
             }
         }
 
-#endregion
+        #endregion Private Static Helper Methods
     }
 
     public delegate MessageHandler AddFunc();
+
     public delegate MessageHandler UpdateFunc(MessageHandler old);
 
     /// <summary>
@@ -656,13 +656,11 @@ namespace System
         /// <param name="value">The value</param>
         public Option(string key, string value) { Key = key; Value = value; }
 
-
         /// <summary>
         /// Create an entry with a specified key. The value will be the default value of type <code>V</code>.
         /// </summary>
         /// <param name="key">The key</param>
         public Option(string key) { Key = key; Value = default(string); }
-
 
         /// <summary>
         /// Pretty print an entry

@@ -4,7 +4,7 @@ Copyright (c) 2013, 2014 Paolo Patierno
 
 All rights reserved. This program and the accompanying materials
 are made available under the terms of the Eclipse Public License v1.0
-and Eclipse Distribution License v1.0 which accompany this distribution. 
+and Eclipse Distribution License v1.0 which accompany this distribution.
 
 The Eclipse Public License:  http://www.eclipse.org/legal/epl-v10.html
 The Eclipse Distribution License: http://www.eclipse.org/org/documents/edl-v10.php.
@@ -14,6 +14,7 @@ Contributors:
    Roman Atachiants - integrating with emitter.io
 */
 
+#if WINRT
 
 using System;
 using System.Collections.Generic;
@@ -164,17 +165,23 @@ namespace Emitter
             {
                 case MqttSslProtocols.None:
                     return SocketProtectionLevel.PlainSocket;
+
                 case MqttSslProtocols.SSLv3:
                     return SocketProtectionLevel.SslAllowNullEncryption;
+
                 case MqttSslProtocols.TLSv1_0:
                     return SocketProtectionLevel.Tls10;
+
                 case MqttSslProtocols.TLSv1_1:
                     return SocketProtectionLevel.Tls11;
+
                 case MqttSslProtocols.TLSv1_2:
                     return SocketProtectionLevel.Tls12;
+
                 default:
                     throw new ArgumentException("SSL/TLS protocol version not supported");
             }
         }
     }
 }
+#endif

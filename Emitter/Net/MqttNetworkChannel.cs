@@ -4,7 +4,7 @@ Copyright (c) 2013, 2014 Paolo Patierno
 
 All rights reserved. This program and the accompanying materials
 are made available under the terms of the Eclipse Public License v1.0
-and Eclipse Distribution License v1.0 which accompany this distribution. 
+and Eclipse Distribution License v1.0 which accompany this distribution.
 
 The Eclipse Public License:  http://www.eclipse.org/legal/epl-v10.html
 The Eclipse Distribution License: http://www.eclipse.org/org/documents/edl-v10.php.
@@ -14,19 +14,28 @@ Contributors:
    Roman Atachiants - integrating with emitter.io
 */
 
-
 #if SSL
 #if (MF_FRAMEWORK_VERSION_V4_2 || MF_FRAMEWORK_VERSION_V4_3)
 using Microsoft.SPOT.Net.Security;
 #else
+
 using System.Net.Security;
 using System.Security.Authentication;
+
 #endif
 #endif
-using System.Net.Sockets;
-using System.Net;
-using System.Security.Cryptography.X509Certificates;
+
 using System;
+using System.Net;
+using System.Net.Sockets;
+using System.Security.Cryptography.X509Certificates;
+
+#if !MF
+
+using System.Net.Security;
+using System.Security.Authentication;
+
+#endif
 
 namespace Emitter
 {
@@ -39,20 +48,25 @@ namespace Emitter
         private readonly RemoteCertificateValidationCallback userCertificateValidationCallback;
         private readonly LocalCertificateSelectionCallback userCertificateSelectionCallback;
 #endif
+
         // remote host information
         private string remoteHostName;
+
         private IPAddress remoteIpAddress;
         private int remotePort;
 
         // socket for communication
         private Socket socket;
+
         // using SSL
         private bool secure;
 
         // CA certificate (on client)
         private X509Certificate caCert;
+
         // Server certificate (on broker)
         private X509Certificate serverCert;
+
         // client certificate (on client)
         private X509Certificate clientCert;
 
@@ -75,8 +89,10 @@ namespace Emitter
         public int RemotePort { get { return this.remotePort; } }
 
 #if SSL
+
         // SSL stream
         private SslStream sslStream;
+
 #if (!MF_FRAMEWORK_VERSION_V4_2 && !MF_FRAMEWORK_VERSION_V4_3)
         private NetworkStream netStream;
 #endif
@@ -118,9 +134,8 @@ namespace Emitter
             : this(socket, false, null, MqttSslProtocols.None)
 #endif
         {
-
         }
-        
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -129,6 +144,7 @@ namespace Emitter
         /// <param name="serverCert">Server X509 certificate for secure connection</param>
         /// <param name="sslProtocol">SSL/TLS protocol version</param>
 #if !(MF_FRAMEWORK_VERSION_V4_2 || MF_FRAMEWORK_VERSION_V4_3 || COMPACT_FRAMEWORK)
+
         /// <param name="userCertificateSelectionCallback">A RemoteCertificateValidationCallback delegate responsible for validating the certificate supplied by the remote party</param>
         /// <param name="userCertificateValidationCallback">A LocalCertificateSelectionCallback delegate responsible for selecting the certificate used for authentication</param>
         public MqttNetworkChannel(Socket socket, bool secure, X509Certificate serverCert, MqttSslProtocols sslProtocol,
@@ -172,6 +188,7 @@ namespace Emitter
         /// <param name="clientCert">Client certificate</param>
         /// <param name="sslProtocol">SSL/TLS protocol version</param>
 #if !(MF_FRAMEWORK_VERSION_V4_2 || MF_FRAMEWORK_VERSION_V4_3 || COMPACT_FRAMEWORK)
+
         /// <param name="userCertificateSelectionCallback">A RemoteCertificateValidationCallback delegate responsible for validating the certificate supplied by the remote party</param>
         /// <param name="userCertificateValidationCallback">A LocalCertificateSelectionCallback delegate responsible for selecting the certificate used for authentication</param>
         public MqttNetworkChannel(string remoteHostName, int remotePort, bool secure, X509Certificate caCert, X509Certificate clientCert, MqttSslProtocols sslProtocol,
@@ -194,7 +211,13 @@ namespace Emitter
             // in this case the parameter remoteHostName isn't a valid IP address
             if (remoteIpAddress == null)
             {
+#if FX || MF || WINRT
                 IPHostEntry hostEntry = Dns.GetHostEntry(remoteHostName);
+#else
+                var task = Dns.GetHostEntryAsync(remoteHostName);
+                task.Wait();
+                IPHostEntry hostEntry = task.Result;
+#endif
                 if ((hostEntry != null) && (hostEntry.AddressList.Length > 0))
                 {
                     // check for the first address not null
@@ -260,7 +283,7 @@ namespace Emitter
                     clientCertificates,
                     MqttSslUtility.ToSslPlatformEnum(this.sslProtocol),
                     false);
-                
+
 #endif
             }
 #endif
@@ -366,14 +389,19 @@ namespace Emitter
 #if SSL
             if (this.secure)
             {
-#if (!MF_FRAMEWORK_VERSION_V4_2 && !MF_FRAMEWORK_VERSION_V4_3)
+#if (!MF)
                 this.netStream.Close();
 #endif
                 this.sslStream.Close();
             }
             this.socket.Close();
 #else
+
+#if FX || MF || WINRT
             this.socket.Close();
+#else
+            this.socket.Shutdown(SocketShutdown.Both);
+#endif
 #endif
         }
 
@@ -417,7 +445,7 @@ namespace Emitter
 #if (!MF_FRAMEWORK_VERSION_V4_2 && !MF_FRAMEWORK_VERSION_V4_3)
             return ipAddress.AddressFamily;
 #else
-            return (ipAddress.ToString().IndexOf(':') != -1) ? 
+            return (ipAddress.ToString().IndexOf(':') != -1) ?
                 AddressFamily.InterNetworkV6 : AddressFamily.InterNetwork;
 #endif
         }
@@ -429,19 +457,23 @@ namespace Emitter
     public static class MqttSslUtility
     {
 #if (!MF_FRAMEWORK_VERSION_V4_2 && !MF_FRAMEWORK_VERSION_V4_3 && !COMPACT_FRAMEWORK)
+
         public static SslProtocols ToSslPlatformEnum(MqttSslProtocols mqttSslProtocol)
         {
             switch (mqttSslProtocol)
             {
                 case MqttSslProtocols.None:
                     return SslProtocols.None;
+
                 case MqttSslProtocols.SSLv3:
                     return SslProtocols.Ssl3;
+
                 case MqttSslProtocols.TLSv1_0:
                     return SslProtocols.Tls;
 #if !NO_TLS_1_1
                 case MqttSslProtocols.TLSv1_1:
                     return SslProtocols.Tls11;
+
                 case MqttSslProtocols.TLSv1_2:
                     return SslProtocols.Tls12;
 #endif
@@ -449,6 +481,7 @@ namespace Emitter
                     throw new ArgumentException("SSL/TLS protocol version not supported");
             }
         }
+
 #elif (MF_FRAMEWORK_VERSION_V4_2 || MF_FRAMEWORK_VERSION_V4_3)
         public static SslProtocols ToSslPlatformEnum(MqttSslProtocols mqttSslProtocol)
         {
@@ -456,10 +489,13 @@ namespace Emitter
             {
                 case MqttSslProtocols.None:
                     return SslProtocols.None;
+
                 case MqttSslProtocols.SSLv3:
                     return SslProtocols.SSLv3;
+
                 case MqttSslProtocols.TLSv1_0:
                     return SslProtocols.TLSv1;
+
                 case MqttSslProtocols.TLSv1_1:
                 case MqttSslProtocols.TLSv1_2:
                 default:

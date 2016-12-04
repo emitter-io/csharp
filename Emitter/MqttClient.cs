@@ -4,7 +4,7 @@ Copyright (c) 2013, 2014 Paolo Patierno
 
 All rights reserved. This program and the accompanying materials
 are made available under the terms of the Eclipse Public License v1.0
-and Eclipse Distribution License v1.0 which accompany this distribution. 
+and Eclipse Distribution License v1.0 which accompany this distribution.
 
 The Eclipse Public License:  http://www.eclipse.org/legal/epl-v10.html
 The Eclipse Distribution License: http://www.eclipse.org/org/documents/edl-v10.php.
@@ -14,39 +14,52 @@ Contributors:
    Roman Atachiants - integrating with emitter.io
 */
 
-
 using System;
-using System.Net;
+
 #if !(WINDOWS_APP || WINDOWS_PHONE_APP)
+
 using System.Net.Sockets;
 using System.Security.Cryptography.X509Certificates;
+
 #endif
+
 using System.Threading;
 using Emitter.Messages;
 using Emitter.Session;
 using Emitter.Utility;
 using Emitter.Internal;
+using System.Collections;
+
 // if .Net Micro Framework
 #if (MF_FRAMEWORK_VERSION_V4_2 || MF_FRAMEWORK_VERSION_V4_3)
 using Microsoft.SPOT;
 #if SSL
 using Microsoft.SPOT.Net.Security;
 #endif
-// else other frameworks (.Net, .Net Compact, Mono, Windows Phone) 
+// else other frameworks (.Net, .Net Compact, Mono, Windows Phone)
 #else
-using System.Collections.Generic;
+
 #if (SSL && !(WINDOWS_APP || WINDOWS_PHONE_APP))
+
 using System.Security.Authentication;
 using System.Net.Security;
+
 #endif
 #endif
 
 #if (WINDOWS_APP || WINDOWS_PHONE_APP)
+
 using Windows.Networking.Sockets;
+
 #endif
 
-using System.Collections;
 using System.IO;
+
+#if (!MF_FRAMEWORK_VERSION_V4_2 && !MF_FRAMEWORK_VERSION_V4_3 && !MF_FRAMEWORK_VERSION_V4_4 && !WINRT)
+
+using System.Net.Security;
+
+#endif
 
 namespace Emitter
 {
@@ -82,10 +95,12 @@ namespace Emitter
 
         // broker hostname (or ip address) and port
         private string brokerHostName;
+
         private int brokerPort;
 
         // running status of threads
         private bool isRunning;
+
         // event for raising received message event
         private AutoResetEvent receiveEventWaitHandle;
 
@@ -93,42 +108,52 @@ namespace Emitter
         private AutoResetEvent inflightWaitHandle;
 
         // event for signaling synchronous receive
-        AutoResetEvent syncEndReceiving;
+        private AutoResetEvent syncEndReceiving;
+
         // message received
-        MqttMsgBase msgReceived;
+        private MqttMsgBase msgReceived;
 
         // exeption thrown during receiving
-        Exception exReceiving;
+        private Exception exReceiving;
 
         // keep alive period (in ms)
         private int keepAlivePeriod;
+
         // events for signaling on keep alive thread
         private AutoResetEvent keepAliveEvent;
+
         private AutoResetEvent keepAliveEventEnd;
+
         // last communication time in ticks
         private int lastCommTime;
 
         // event for PUBLISH message received
         public event MqttMsgPublishEventHandler MqttMsgPublishReceived;
+
         // event for published message
         public event MqttMsgPublishedEventHandler MqttMsgPublished;
+
         // event for subscribed topic
         public event MqttMsgSubscribedEventHandler MqttMsgSubscribed;
+
         // event for unsubscribed topic
         public event MqttMsgUnsubscribedEventHandler MqttMsgUnsubscribed;
 
         // event for peer/client disconnection
         public event ConnectionClosedEventHandler ConnectionClosed;
-        
+
         // channel to communicate over the network
         private IMqttNetworkChannel channel;
 
         // inflight messages queue
         private Queue inflightQueue;
+
         // internal queue for received messages about inflight messages
         private Queue internalQueue;
+
         // internal queue for dispatching events
         private Queue eventQueue;
+
         // session
         private MqttClientSession session;
 
@@ -224,11 +249,13 @@ namespace Emitter
         /// <param name="secure">Using secure connection</param>
         /// <param name="sslProtocol">SSL/TLS protocol version</param>
 #if !(WINDOWS_APP || WINDOWS_PHONE_APP)
+
         /// <param name="caCert">CA certificate for secure connection</param>
         /// <param name="clientCert">Client certificate</param>
-        public MqttClient(string brokerHostName, int brokerPort, bool secure, X509Certificate caCert, X509Certificate clientCert, MqttSslProtocols sslProtocol)            
+        public MqttClient(string brokerHostName, int brokerPort, bool secure, X509Certificate caCert, X509Certificate clientCert, MqttSslProtocols sslProtocol)
 #else
-        public MqttClient(string brokerHostName, int brokerPort, bool secure, MqttSslProtocols sslProtocol)            
+
+        public MqttClient(string brokerHostName, int brokerPort, bool secure, MqttSslProtocols sslProtocol)
 #endif
         {
 #if !(MF_FRAMEWORK_VERSION_V4_2 || MF_FRAMEWORK_VERSION_V4_3 || COMPACT_FRAMEWORK || WINDOWS_APP || WINDOWS_PHONE_APP)
@@ -239,7 +266,6 @@ namespace Emitter
             this.Init(brokerHostName, brokerPort, secure, caCert, clientCert, sslProtocol);
 #endif
         }
-
 
 #if !(MF_FRAMEWORK_VERSION_V4_2 || MF_FRAMEWORK_VERSION_V4_3 || COMPACT_FRAMEWORK || WINDOWS_APP || WINDOWS_PHONE_APP)
 
@@ -268,8 +294,8 @@ namespace Emitter
         /// <param name="sslProtocol">SSL/TLS protocol version</param>
         /// <param name="userCertificateValidationCallback">A RemoteCertificateValidationCallback delegate responsible for validating the certificate supplied by the remote party</param>
         /// <param name="userCertificateSelectionCallback">A LocalCertificateSelectionCallback delegate responsible for selecting the certificate used for authentication</param>
-        public MqttClient(string brokerHostName, int brokerPort, bool secure, MqttSslProtocols sslProtocol, 
-            RemoteCertificateValidationCallback userCertificateValidationCallback, 
+        public MqttClient(string brokerHostName, int brokerPort, bool secure, MqttSslProtocols sslProtocol,
+            RemoteCertificateValidationCallback userCertificateValidationCallback,
             LocalCertificateSelectionCallback userCertificateSelectionCallback)
             : this(brokerHostName, brokerPort, secure, null, null, sslProtocol, userCertificateValidationCallback, userCertificateSelectionCallback)
         {
@@ -292,6 +318,7 @@ namespace Emitter
         {
             this.Init(brokerHostName, brokerPort, secure, caCert, clientCert, sslProtocol, userCertificateValidationCallback, userCertificateSelectionCallback);
         }
+
 #endif
 
         /// <summary>
@@ -304,12 +331,14 @@ namespace Emitter
         /// <param name="clientCert">Client certificate</param>
         /// <param name="sslProtocol">SSL/TLS protocol version</param>
 #if !(MF_FRAMEWORK_VERSION_V4_2 || MF_FRAMEWORK_VERSION_V4_3 || COMPACT_FRAMEWORK || WINDOWS_APP || WINDOWS_PHONE_APP)
+
         /// <param name="userCertificateSelectionCallback">A RemoteCertificateValidationCallback delegate responsible for validating the certificate supplied by the remote party</param>
         /// <param name="userCertificateValidationCallback">A LocalCertificateSelectionCallback delegate responsible for selecting the certificate used for authentication</param>
         private void Init(string brokerHostName, int brokerPort, bool secure, X509Certificate caCert, X509Certificate clientCert, MqttSslProtocols sslProtocol,
             RemoteCertificateValidationCallback userCertificateValidationCallback,
             LocalCertificateSelectionCallback userCertificateSelectionCallback)
 #elif (WINDOWS_APP || WINDOWS_PHONE_APP)
+
         private void Init(string brokerHostName, int brokerPort, bool secure, MqttSslProtocols sslProtocol)
 #else
         private void Init(string brokerHostName, int brokerPort, bool secure, X509Certificate caCert, X509Certificate clientCert, MqttSslProtocols sslProtocol)
@@ -454,9 +483,9 @@ namespace Emitter
             this.isConnectionClosing = false;
             // start thread for receiving messages from broker
             Fx.StartThread(this.ReceiveThread);
-            
+
             MqttMsgConnack connack = (MqttMsgConnack)this.SendReceive(connect);
-            // if connection accepted, start keep alive timer and 
+            // if connection accepted, start keep alive timer and
             if (connack.ReturnCode == MqttMsgConnack.CONN_ACCEPTED)
             {
                 // set all client properties
@@ -481,7 +510,7 @@ namespace Emitter
 
                 // start thread for raising received message event from broker
                 Fx.StartThread(this.DispatchEventThread);
-                
+
                 // start thread for handling inflight messages queue to broker asynchronously (publish and acknowledge)
                 Fx.StartThread(this.ProcessInflightThread);
 
@@ -520,7 +549,6 @@ namespace Emitter
             // wait end process inflight thread
             if (this.inflightWaitHandle != null)
                 this.inflightWaitHandle.Set();
-
 
             // unlock keep alive thread and wait
             this.keepAliveEvent.Set();
@@ -657,7 +685,7 @@ namespace Emitter
             {
                 this.isConnectionClosing = true;
                 this.receiveEventWaitHandle.Set();
-                
+
                 // If not connected ensure that all actions are stopped,
                 // otherwise close will not be called because a the DispatchThread is not running
                 if (!this.IsConnected)
@@ -717,7 +745,7 @@ namespace Emitter
                     new MqttMsgUnsubscribedEventArgs(messageId));
             }
         }
-        
+
         /// <summary>
         /// Wrapper method for peer/client disconnection
         /// </summary>
@@ -880,7 +908,6 @@ namespace Emitter
                     //        to/from client and message id could be the same (one tracked by broker and the other by client)
                     var msgCtxFinder = new MqttMsgContextFinder(msg.MessageId, MqttMsgFlow.ToAcknowledge);
                     var msgCtx = (MqttMsgContext)Utils.GetFromQueue(this.inflightQueue, msgCtxFinder.Find);
-                    
 
                     // the PUBLISH message is alredy in the inflight queue, we don't need to re-enqueue but we need
                     // to change state to re-send PUBREC
@@ -938,7 +965,7 @@ namespace Emitter
 
                 lock (this.inflightQueue)
                 {
-                    // check number of messages inside inflight queue 
+                    // check number of messages inside inflight queue
                     enqueue = (this.inflightQueue.Count < this.settings.InflightQueueSize);
 
                     if (enqueue)
@@ -1087,7 +1114,6 @@ namespace Emitter
                     readBytes = this.channel.Receive(fixedHeaderFirstByte);
                     if (readBytes > 0)
                     {
-
                         // extract message type from received byte
                         msgType = (byte)((fixedHeaderFirstByte[0] & MqttMsgBase.MSG_TYPE_MASK) >> MqttMsgBase.MSG_TYPE_OFFSET);
 
@@ -1096,7 +1122,7 @@ namespace Emitter
                             // CONNECT message received
                             case MqttMsgBase.MQTT_MSG_CONNECT_TYPE:
                                 throw new MqttClientException(MqttClientErrorCode.WrongBrokerMessage);
-                                
+
                             // CONNACK message received
                             case MqttMsgBase.MQTT_MSG_CONNACK_TYPE:
                                 this.msgReceived = MqttMsgConnack.Parse(fixedHeaderFirstByte[0], (byte)this.ProtocolVersion, this.channel);
@@ -1188,7 +1214,7 @@ namespace Emitter
                                 this.EnqueueInternal(pubrel);
 
                                 break;
-                                
+
                             // PUBCOMP message received
                             case MqttMsgBase.MQTT_MSG_PUBCOMP_TYPE:
 
@@ -1250,7 +1276,7 @@ namespace Emitter
                     {
                         // [v3.1.1] scenarios the receiver MUST close the network connection
                         MqttClientException ex = e as MqttClientException;
-                        close = ((ex.ErrorCode == MqttClientErrorCode.InvalidFlagBits) || 
+                        close = ((ex.ErrorCode == MqttClientErrorCode.InvalidFlagBits) ||
                                 (ex.ErrorCode == MqttClientErrorCode.InvalidProtocolName) ||
                                 (ex.ErrorCode == MqttClientErrorCode.InvalidConnectFlags));
                     }
@@ -1261,7 +1287,7 @@ namespace Emitter
                         close = true;
                     }
 #endif
-                    
+
                     if (close)
                     {
                         // wake up thread that will notify connection is closing
@@ -1278,7 +1304,7 @@ namespace Emitter
         {
             int delta = 0;
             int wait = this.keepAlivePeriod;
-            
+
             // create event to signal that current thread is end
             this.keepAliveEventEnd = new AutoResetEvent(false);
 
@@ -1300,8 +1326,8 @@ namespace Emitter
                     if (delta >= this.keepAlivePeriod)
                     {
                         // ... send keep alive
-						this.Ping();
-						wait = this.keepAlivePeriod;
+                        this.Ping();
+                        wait = this.keepAlivePeriod;
                     }
                     else
                     {
@@ -1368,7 +1394,7 @@ namespace Emitter
                                     if (internalEvent.GetType() == typeof(MsgPublishedInternalEvent))
                                         this.OnMqttMsgPublished(msg.MessageId, false);
                                     else
-                                        // raise PUBLISH message received event 
+                                        // raise PUBLISH message received event
                                         this.OnMqttMsgPublishReceived((MqttMsgPublish)msg);
                                     break;
 
@@ -1383,7 +1409,7 @@ namespace Emitter
                                 // PUBREL message received
                                 case MqttMsgBase.MQTT_MSG_PUBREL_TYPE:
 
-                                    // raise message received event 
+                                    // raise message received event
                                     // (PUBREL received for QoS Level 2)
                                     this.OnMqttMsgPublishReceived((MqttMsgPublish)msg);
                                     break;
@@ -1413,7 +1439,7 @@ namespace Emitter
                             }
                         }
                     }
-                    
+
                     // all events for received messages dispatched, check if there is closing connection
                     if ((this.eventQueue.Count == 0) && this.isConnectionClosing)
                     {
@@ -1661,7 +1687,7 @@ namespace Emitter
                                                 }
                                             }
 
-                                            // current message not acknowledged, no PUBACK or SUBACK/UNSUBACK or not equal messageid 
+                                            // current message not acknowledged, no PUBACK or SUBACK/UNSUBACK or not equal messageid
                                             if (!acknowledge)
                                             {
                                                 delta = Environment.TickCount - msgContext.Timestamp;
@@ -1957,7 +1983,7 @@ namespace Emitter
                                             // current message not acknowledged
                                             if (!acknowledge)
                                             {
-                                                delta = Environment.TickCount - msgContext.Timestamp; 
+                                                delta = Environment.TickCount - msgContext.Timestamp;
                                                 // check timeout for receiving PUBCOMP since PUBREL was sent
                                                 if (delta >= this.settings.DelayOnRetry)
                                                 {
@@ -2026,7 +2052,7 @@ namespace Emitter
                                                 if (msgContext.Attempt > 1)
                                                     pubrel.DupFlag = true;
                                             }
-                                            
+
                                             this.Send(pubrel);
 
                                             // update timeout : minimum between delay (based on current message sent) or current timeout
@@ -2040,9 +2066,11 @@ namespace Emitter
                                     case MqttMsgState.SendPubcomp:
                                         // TODO : impossible ?
                                         break;
+
                                     case MqttMsgState.SendPuback:
                                         // TODO : impossible ? --> QueuedQos1 ToAcknowledge
                                         break;
+
                                     default:
                                         break;
                                 }
@@ -2162,6 +2190,7 @@ namespace Emitter
         {
             // PUBLISH message id
             internal ushort MessageId { get; set; }
+
             // message flow into inflight queue
             internal MqttMsgFlow Flow { get; set; }
 
@@ -2182,7 +2211,6 @@ namespace Emitter
                 return ((msgCtx.Message.Type == MqttMsgBase.MQTT_MSG_PUBLISH_TYPE) &&
                         (msgCtx.Message.MessageId == this.MessageId) &&
                         msgCtx.Flow == this.Flow);
-
             }
         }
     }

@@ -1,0 +1,19 @@
+﻿{
+  "version": "1.0.0-*",
+
+  "buildOptions": {
+    "optimize": true
+  },
+
+  "frameworks": {
+    "netstandard1.5": {
+      "imports": "dnxcore50",
+      "define": [ "DNXCORE50" ],
+      "dependencies": {
+        "NETStandard.Library": "1.5.0-*",
+        "System.Net.Security": "4.3.0",
+        "System.Net.NameResolution": "4.3.0"
+      }
+    }
+  }
+}
