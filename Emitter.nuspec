@@ -40,5 +40,7 @@
       
       <file src="bin\Release\Emitter.WinRT\*.*" target="lib\win81" />
       <file src="bin\Release\Emitter.WinRT\*.*" target="lib\wpa81" />
+
+      <file src="bin\Release\Emitter.DnxCore50\*.*" target="lib\netstandard1.5" />
 	</files>
 </package>
