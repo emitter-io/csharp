@@ -41,7 +41,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Emitter\Emitter.Net45.csproj">
+    <ProjectReference Include="..\Emitter.Projects\Emitter.Net45.csproj">
       <Project>{a11aef5a-b246-4fe8-8330-06db73cc8074}</Project>
       <Name>Emitter.Net45</Name>
     </ProjectReference>

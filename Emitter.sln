@@ -3,33 +3,33 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Emitter.Net45", "Emitter\Emitter.Net45.csproj", "{A11AEF5A-B246-4FE8-8330-06DB73CC8074}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Emitter.Net45", "Emitter.Projects\Emitter.Net45.csproj", "{A11AEF5A-B246-4FE8-8330-06DB73CC8074}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Emitter.NetMf42", "Emitter\Emitter.NetMf42.csproj", "{F733523A-F14E-4F5A-9E7C-085CA80F52B1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Emitter.NetMf42", "Emitter.Projects\Emitter.NetMf42.csproj", "{F733523A-F14E-4F5A-9E7C-085CA80F52B1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Emitter.NetMf43", "Emitter\Emitter.NetMf43.csproj", "{6A6D540B-8554-4FFD-8884-8BEFCCD9AD41}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Emitter.NetMf43", "Emitter.Projects\Emitter.NetMf43.csproj", "{6A6D540B-8554-4FFD-8884-8BEFCCD9AD41}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Emitter.WinRT", "Emitter\Emitter.WinRT.csproj", "{0238F0E3-A02B-428D-8A3F-410D8F15BB50}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Emitter.WinRT", "Emitter.Projects\Emitter.WinRT.csproj", "{0238F0E3-A02B-428D-8A3F-410D8F15BB50}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Emitter.NetMf44", "Emitter\Emitter.NetMf44.csproj", "{61703A0B-C295-41C5-B139-C75606F992B2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Emitter.NetMf44", "Emitter.Projects\Emitter.NetMf44.csproj", "{61703A0B-C295-41C5-B139-C75606F992B2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Emitter.Sample", "Emitter.Sample\Emitter.Sample.csproj", "{4BAE6AD4-ED2F-4F05-B822-266AF9FC5ADE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Emitter.Net451", "Emitter\Emitter.Net451.csproj", "{C0B70B3F-C47E-4D9F-84B6-9AB693223FC6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Emitter.Net451", "Emitter.Projects\Emitter.Net451.csproj", "{C0B70B3F-C47E-4D9F-84B6-9AB693223FC6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Emitter.Net452", "Emitter\Emitter.Net452.csproj", "{38B7F60B-94BD-4881-BFBF-AFD9AD6540B7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Emitter.Net452", "Emitter.Projects\Emitter.Net452.csproj", "{38B7F60B-94BD-4881-BFBF-AFD9AD6540B7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Emitter.Net46", "Emitter\Emitter.Net46.csproj", "{0722590E-1F09-4A65-9039-876F6AC8056E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Emitter.Net46", "Emitter.Projects\Emitter.Net46.csproj", "{0722590E-1F09-4A65-9039-876F6AC8056E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Emitter.Net461", "Emitter\Emitter.Net461.csproj", "{A2D07DC8-CCFA-445B-96DB-F9E0385F864B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Emitter.Net461", "Emitter.Projects\Emitter.Net461.csproj", "{A2D07DC8-CCFA-445B-96DB-F9E0385F864B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Emitter.Net40", "Emitter\Emitter.Net40.csproj", "{D6733DE8-3DA7-4CF9-9F40-A36F712752CB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Emitter.Net40", "Emitter.Projects\Emitter.Net40.csproj", "{D6733DE8-3DA7-4CF9-9F40-A36F712752CB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Emitter.Net35", "Emitter\Emitter.Net35.csproj", "{B6FBD96F-49AC-4304-AAA6-02EDA4E00B50}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Emitter.Net35", "Emitter.Projects\Emitter.Net35.csproj", "{B6FBD96F-49AC-4304-AAA6-02EDA4E00B50}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Emitter.Net20", "Emitter\Emitter.Net20.csproj", "{CD244156-3176-4CEE-BFE1-54D691F48C81}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Emitter.Net20", "Emitter.Projects\Emitter.Net20.csproj", "{CD244156-3176-4CEE-BFE1-54D691F48C81}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Emitter.Net30", "Emitter\Emitter.Net30.csproj", "{8AD15CA7-2D75-4C8A-B3CF-83122D24F247}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Emitter.Net30", "Emitter.Projects\Emitter.Net30.csproj", "{8AD15CA7-2D75-4C8A-B3CF-83122D24F247}"
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Emitter.NetCore", "Emitter\Emitter.NetCore.xproj", "{A09DED60-2551-452F-936F-53862F22A79C}"
 EndProject
