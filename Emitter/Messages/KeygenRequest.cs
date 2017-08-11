@@ -50,43 +50,85 @@ namespace Emitter.Messages
         /// <returns></returns>
         public string ToJson()
         {
-            var keyType = "r";
-            switch(this.Type)
+            var keyType = "";
+            if ((this.Type & EmitterKeyType.Read) != 0)
+                keyType += "r";
+            if ((this.Type & EmitterKeyType.Write) != 0)
+                keyType += "w";
+            if ((this.Type & EmitterKeyType.Store) != 0)
+                keyType += "s";
+            if ((this.Type & EmitterKeyType.Load) != 0)
+                keyType += "l";
+            if ((this.Type & EmitterKeyType.Presence) != 0)
+                keyType += "p";
+
+            return JsonSerializer.SerializeObject(new Hashtable
             {
-                case EmitterKeyType.WriteOnly: keyType = "w"; break;
-                case EmitterKeyType.ReadWrite: keyType = "rw"; break;
-                case EmitterKeyType.ReadOnly:
-                default: keyType = "r"; break;
-            }
-
-            var map = new Hashtable();
-            map.Add("key", this.Key);
-            map.Add("channel", this.Channel);
-            map.Add("type", keyType);
-            map.Add("ttl", this.Ttl);
-
-            return JsonSerializer.SerializeObject(map);
+                {"key", this.Key},
+                {"channel", this.Channel},
+                {"type", keyType},
+                {"ttl", this.Ttl}
+            });
         }
     }
 
     /// <summary>
     /// Represents the key type.
     /// </summary>
-    public enum EmitterKeyType
+    [Flags]
+    public enum EmitterKeyType : uint
     {
+        /// <summary>
+        /// Key has no privileges.
+        /// </summary>
+        None = 0,
+        
+        /// <summary>
+        /// Key should be allowed to subscribe to the target channel.
+        /// </summary>
+        Read = 1 << 1,
+
+        /// <summary>
+        /// Key should be allowed to publish to the target channel.
+        /// </summary>
+        Write = 1 << 2,
+
+        /// <summary>
+        /// Key should be allowed to write to the message history of the target channel.
+        /// </summary>
+        Store = 1 << 3,
+
+        /// <summary>
+        /// Key should be allowed to write to read the message history of the target channel.
+        /// </summary>
+        Load = 1 << 4,
+
+        /// <summary>
+        /// Key should be allowed to query the presence on the target channel.
+        /// </summary>
+        Presence = 1 << 5,
+
+        /// <summary>
+        /// Key should be allowed to read and write to the target channel.
+        /// </summary>
+        ReadWrite = Read | Write,
+
+        /// <summary>
+        /// Key should be allowed to read and write the message history.
+        /// </summary>
+        StoreLoad = Store | Load,
+
         /// <summary>
         /// Requests the key to be a read-only key.
         /// </summary>
-        ReadOnly  = 0,
+        [Obsolete("Use EmitterKeyType.Read instead")]
+        ReadOnly  = Read,
 
         /// <summary>
         /// Requests the key to be a write-only key.
         /// </summary>
-        WriteOnly = 1,
-
-        /// <summary>
-        /// Requests the key to be a read/write key.
-        /// </summary>
-        ReadWrite = 2
+        [Obsolete("Use EmitterKeyType.Write instead")]
+        WriteOnly = Write,
+        
     }
 }
