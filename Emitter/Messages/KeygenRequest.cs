@@ -37,7 +37,7 @@ namespace Emitter.Messages
         /// <summary>
         /// Gets or sets the type of the requested key.
         /// </summary>
-        public EmitterKeyType Type;
+        public SecurityAccess Type;
 
         /// <summary>
         /// Gets or sets the number of seconds for which this key will be usable.
@@ -51,15 +51,15 @@ namespace Emitter.Messages
         public string ToJson()
         {
             var keyType = "";
-            if ((this.Type & EmitterKeyType.Read) != 0)
+            if ((this.Type & SecurityAccess.Read) != 0)
                 keyType += "r";
-            if ((this.Type & EmitterKeyType.Write) != 0)
+            if ((this.Type & SecurityAccess.Write) != 0)
                 keyType += "w";
-            if ((this.Type & EmitterKeyType.Store) != 0)
+            if ((this.Type & SecurityAccess.Store) != 0)
                 keyType += "s";
-            if ((this.Type & EmitterKeyType.Load) != 0)
+            if ((this.Type & SecurityAccess.Load) != 0)
                 keyType += "l";
-            if ((this.Type & EmitterKeyType.Presence) != 0)
+            if ((this.Type & SecurityAccess.Presence) != 0)
                 keyType += "p";
 
             return JsonSerializer.SerializeObject(new Hashtable
@@ -75,8 +75,16 @@ namespace Emitter.Messages
     /// <summary>
     /// Represents the key type.
     /// </summary>
-    [Flags]
+    [Obsolete("Use SecurityAccess enum instead")]
     public enum EmitterKeyType : uint
+    {
+    }
+
+    /// <summary>
+    /// Represents the security access particular to a given key.
+    /// </summary>
+    [Flags]
+    public enum SecurityAccess : uint
     {
         /// <summary>
         /// Key has no privileges.
@@ -99,7 +107,7 @@ namespace Emitter.Messages
         Store = 1 << 3,
 
         /// <summary>
-        /// Key should be allowed to write to read the message history of the target channel.
+        /// Key should be allowed to read the message history of the target channel.
         /// </summary>
         Load = 1 << 4,
 
@@ -116,19 +124,7 @@ namespace Emitter.Messages
         /// <summary>
         /// Key should be allowed to read and write the message history.
         /// </summary>
-        StoreLoad = Store | Load,
+        StoreLoad = Store | Load
 
-        /// <summary>
-        /// Requests the key to be a read-only key.
-        /// </summary>
-        [Obsolete("Use EmitterKeyType.Read instead")]
-        ReadOnly  = Read,
-
-        /// <summary>
-        /// Requests the key to be a write-only key.
-        /// </summary>
-        [Obsolete("Use EmitterKeyType.Write instead")]
-        WriteOnly = Write,
-        
     }
 }

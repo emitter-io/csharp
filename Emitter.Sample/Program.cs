@@ -16,7 +16,7 @@ namespace Emitter.Sample
             using (var emitter = Connection.Establish())
             {
                 // Generate a read-write key for our channel
-                emitter.GenerateKey("<secret key>", "chat", Messages.EmitterKeyType.ReadWrite, (keygen) =>
+                emitter.GenerateKey("<secret key>", "chat", Messages.SecurityAccess.ReadWrite, (keygen) =>
                 {
                     Console.WriteLine("Generated Key: " + keygen.Key);
                 });
