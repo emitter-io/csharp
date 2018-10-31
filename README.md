@@ -46,7 +46,7 @@ var emitter    = new Emitter.Connection();
 var channelKey = "<channel key for 'chat' channel>";
 
 // Connect to emitter.io service
-emitter.Connect();
+emitter.Connect(host, port);
 
 // Handle chat messages
 emitter.On(channelKey, "chat", (channel, msg) =>
