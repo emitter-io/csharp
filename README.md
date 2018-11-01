@@ -42,11 +42,11 @@ Below is a sample program written using this C# client library. This demonstrate
 
 ```
 // Creating a connection to emitter.io service.
-var emitter    = new Emitter.Connection();
+var emitter    = new Emitter.Connection(host, port);
 var channelKey = "<channel key for 'chat' channel>";
 
 // Connect to emitter.io service
-emitter.Connect(host, port);
+emitter.Connect();
 
 // Handle chat messages
 emitter.On(channelKey, "chat", (channel, msg) =>
