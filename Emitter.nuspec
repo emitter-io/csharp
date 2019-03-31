@@ -10,10 +10,10 @@
     <projectUrl>https://github.com/emitter-io/csharp</projectUrl>
     <iconUrl>https://raw.githubusercontent.com/emitter-io/csharp/master/Emitter.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>Emitter is an MQTT client tailored for emitter.io service, allowing real-time publish subscribe. It supports full .Net Framework, .Net Micro Framework and WinRT platform (Windows 8+ and Windows Phone 8+).</description>
+    <description>Emitter is an MQTT client tailored for emitter.io service, allowing real-time publish subscribe. It supports full .Net Framework and WinRT platform (Windows 8+ and Windows Phone 8+).</description>
     <summary>Emitter is an MQTT client tailored for emitter.io service, allowing real-time publish subscribe. It supports full .Net Framework, .Net Micro Framework and WinRT platform (Windows 8+ and Windows Phone 8+).</summary>
     <copyright>Misakai Ltd.</copyright>
-    <tags>emitter mqtt queue messaging pubsub publish subscribe internetofthings iot cloud netmf embedded micro netduino micro-framework hardware winrt windows8 windows8.1 windowsphone windowsphone8.1 gadgeteer</tags>
+    <tags>emitter mqtt queue messaging pubsub publish subscribe internetofthings iot cloud embedded netduino hardware winrt windows8 windows8.1 windowsphone windowsphone8.1 gadgeteer</tags>
     <dependencies>
       <group targetFramework=".NETStandard1.5">
         <dependency id="NETStandard.Library" version="[1.6.0, )" />
@@ -23,27 +23,12 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="bin\Release\Emitter.Net20\*.*" target="lib\net20" />
-    <file src="bin\Release\Emitter.Net30\*.*" target="lib\net30" />
-    <file src="bin\Release\Emitter.Net35\*.*" target="lib\net35" />
     <file src="bin\Release\Emitter.Net40\*.*" target="lib\net40" />
     <file src="bin\Release\Emitter.Net45\*.*" target="lib\net45" />
     <file src="bin\Release\Emitter.Net451\*.*" target="lib\net451" />
     <file src="bin\Release\Emitter.Net452\*.*" target="lib\net452" />
     <file src="bin\Release\Emitter.Net46\*.*" target="lib\net46" />
     <file src="bin\Release\Emitter.Net461\*.*" target="lib\net461" />
-
-    <file src="bin\Release\Emitter.NetMf42\*.*" target="lib\netmf42" />
-    <file src="bin\Release\Emitter.NetMf42\le\*.p*" target="lib\netmf42\le" />
-    <file src="bin\Release\Emitter.NetMf42\be\*.p*" target="lib\netmf42\be" />
-
-    <file src="bin\Release\Emitter.NetMf43\*.*" target="lib\netmf43" />
-    <file src="bin\Release\Emitter.NetMf43\le\*.p*" target="lib\netmf43\le" />
-    <file src="bin\Release\Emitter.NetMf43\be\*.p*" target="lib\netmf43\be" />
-
-    <file src="bin\Release\Emitter.NetMf44\*.*" target="lib\netmf44" />
-    <file src="bin\Release\Emitter.NetMf44\le\*.p*" target="lib\netmf44\le" />
-    <file src="bin\Release\Emitter.NetMf44\be\*.p*" target="lib\netmf44\be" />
 
     <file src="bin\Release\Emitter.WinRT\*.*" target="lib\win81" />
     <file src="bin\Release\Emitter.WinRT\*.*" target="lib\wpa81" />
