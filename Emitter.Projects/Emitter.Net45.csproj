@@ -20,7 +20,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>..\bin\Debug\Emitter.Net45\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;SSL</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;SSL,FX</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>

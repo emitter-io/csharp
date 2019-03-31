@@ -21,7 +21,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>..\bin\Debug\Emitter.WinRT\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;WINDOWS_APP,WINDOWS_PHONE_APP,SSL</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;WINDOWS_APP,WINDOWS_PHONE_APP,SSL,WINRT</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>

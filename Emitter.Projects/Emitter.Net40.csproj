@@ -19,7 +19,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>..\bin\Debug\Emitter.Net40\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;SSL;NO_TLS_1_1</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;SSL;NO_TLS_1_1;FX</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
