@@ -17,6 +17,7 @@ using System.Collections;
 using System.Text;
 
 using Emitter.Messages;
+using Emitter.Utility;
 
 #if (MF_FRAMEWORK_VERSION_V4_2 || MF_FRAMEWORK_VERSION_V4_3)
 
@@ -252,7 +253,7 @@ namespace Emitter
             this.Trie.RegisterHandler(channel, handler);
 
             // Subscribe
-            return this.Client.Subscribe(new string[] { FormatChannel(key, channel, new Option("last", last.ToString())) }, new byte[] { MqttMsgBase.QOS_LEVEL_AT_MOST_ONCE });
+            return this.Client.Subscribe(new string[] { FormatChannel(key, channel, Options.WithLast(last)) }, new byte[] { MqttMsgBase.QOS_LEVEL_AT_MOST_ONCE });
         }
 
         /// <summary>
@@ -349,7 +350,21 @@ namespace Emitter
         /// <returns>The message identifier.</returns>
         public ushort Publish(string key, string channel, string message, int ttl)
         {
-            return this.Client.Publish(FormatChannel(key, channel, new Option("ttl", ttl.ToString())), Encoding.UTF8.GetBytes(message));
+            return this.Client.Publish(FormatChannel(key, channel, Options.WithTTL(ttl)), Encoding.UTF8.GetBytes(message));
+        }
+
+        /// <summary>
+        /// Publishes a message to the emitter.io service asynchronously.
+        /// </summary>
+        /// <param name="key">The key to use for this publish request.</param>
+        /// <param name="channel">The channel to publish to.</param>
+        /// <param name="message">The message body to send.</param>
+        /// <param name="options">The options associated with the message, such as 'ttl' or 'last'. Ex: Options.WithLast(5).</param>
+        /// <returns>The message identifier.</returns>
+        public ushort Publish(string key, string channel, string message, params string[] options)
+        {
+            GetHeader(options, out var retain, out var qos);
+            return this.Client.Publish(FormatChannel(key, channel, options), Encoding.UTF8.GetBytes(message), qos, retain);
         }
 
         /// <summary>
@@ -362,7 +377,21 @@ namespace Emitter
         /// <returns>The message identifier.</returns>
         public ushort Publish(string key, string channel, byte[] message, int ttl)
         {
-            return this.Client.Publish(FormatChannel(key, channel, new Option("ttl", ttl.ToString())), message);
+            return this.Client.Publish(FormatChannel(key, channel, Options.WithTTL(ttl)), message);
+        }
+
+        /// <summary>
+        /// Publishes a message to the emitter.io service asynchronously.
+        /// </summary>
+        /// <param name="key">The key to use for this publish request.</param>
+        /// <param name="channel">The channel to publish to.</param>
+        /// <param name="message">The message body to send.</param>
+        /// <param name="options">The options associated with the message, such as 'ttl' or 'last'. Ex: Options.WithLast(5).</param>
+        /// <returns>The message identifier.</returns>
+        public ushort Publish(string key, string channel, byte[] message, params string[] options)
+        {
+            GetHeader(options, out var retain, out var qos);
+            return this.Client.Publish(FormatChannel(key, channel, options), message, qos, retain);
         }
 
         #endregion Publish Members
@@ -457,7 +486,7 @@ namespace Emitter
         /// <param name="channel">The channel name.</param>
         /// <param name="options">The options.</param>
         /// <returns></returns>
-        private string FormatChannel(string key, string channel, params Option[] options)
+        private string FormatChannel(string key, string channel, params string[] options)
         {
             // Prefix with the key
             var formatted = key.EndsWith("/")
@@ -474,7 +503,10 @@ namespace Emitter
                 formatted += "?";
                 for (int i = 0; i < options.Length; ++i)
                 {
-                    formatted += options[i].Key + "=" + options[i].Value;
+                    if (options[i][0] == '+')
+                        continue;
+
+                    formatted += options[i];
                     if (i + 1 < options.Length)
                         formatted += "&";
                 }
@@ -482,6 +514,24 @@ namespace Emitter
 
             // We're done compiling the channel name
             return formatted;
+        }
+
+        private void GetHeader(string[] options, out bool retain, out byte qos)
+        {
+            retain = false;
+            qos = 0;
+            foreach (string o in options)
+            {
+                switch (o)
+                {
+                    case Options.Retain:
+                        retain = true;
+                        break;
+                    case Options.QoS1:
+                        qos = 1;
+                        break;
+                }
+            }
         }
 
         #endregion Private Members

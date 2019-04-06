@@ -633,39 +633,4 @@ namespace System
         Decimal = 1,
         Hexadecimal
     }
-
-    /// <summary>
-    /// An entry in a dictionary from K to V.
-    /// </summary>
-    public struct Option
-    {
-        /// <summary>
-        /// The key field of the entry
-        /// </summary>
-        public string Key;
-
-        /// <summary>
-        /// The value field of the entry
-        /// </summary>
-        public string Value;
-
-        /// <summary>
-        /// Create an entry with specified key and value
-        /// </summary>
-        /// <param name="key">The key</param>
-        /// <param name="value">The value</param>
-        public Option(string key, string value) { Key = key; Value = value; }
-
-        /// <summary>
-        /// Create an entry with a specified key. The value will be the default value of type <code>V</code>.
-        /// </summary>
-        /// <param name="key">The key</param>
-        public Option(string key) { Key = key; Value = default(string); }
-
-        /// <summary>
-        /// Pretty print an entry
-        /// </summary>
-        /// <returns>(key, value)</returns>
-        public override string ToString() { return "(" + Key + ", " + Value + ")"; }
-    }
 }
