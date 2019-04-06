@@ -33,7 +33,12 @@ namespace Emitter
     public delegate void MessageHandler(string channel, byte[] message);
 
     /// <summary>
-    /// Delegate that defines event handler for cliet/peer disconnection
+    /// Represents a Presence handler callback.
+    /// </summary>
+    public delegate void PresenceHandler(PresenceResponse presenceResponse);
+
+    /// <summary>
+    /// Delegate that defines event handler for client/peer disconnection
     /// </summary>
     public delegate void DisconnectHandler(object sender, EventArgs e);
 
@@ -440,6 +445,11 @@ namespace Emitter
         }
 
         #endregion KeyGen Members
+
+        #region Presence Members
+
+        public event PresenceHandler Presence;
+        #endregion Presence Members
 
         #region Private Members
 
