@@ -35,7 +35,7 @@ namespace Emitter
     /// <summary>
     /// Represents a Presence handler callback.
     /// </summary>
-    public delegate void PresenceHandler(PresenceResponse presenceResponse);
+    public delegate void PresenceHandler(PresenceEvent presenceResponse);
 
     /// <summary>
     /// Delegate that defines event handler for client/peer disconnection
@@ -102,8 +102,7 @@ namespace Emitter
         /// <param name="ex"></param>
         private void InvokeError(Exception ex)
         {
-            if (this.Error != null)
-                this.Error(this, ex);
+            this.Error?.Invoke(this, ex);
         }
 
         /// <summary>
@@ -190,8 +189,7 @@ namespace Emitter
         private void OnDisconnect(object sender, EventArgs e)
         {
             // Forward the event
-            if (this.Disconnected != null)
-                this.Disconnected(sender, e);
+            this.Disconnected?.Invoke(sender, e);
         }
 
         /// <summary>
@@ -449,6 +447,17 @@ namespace Emitter
         #region Presence Members
 
         public event PresenceHandler Presence;
+
+        public void PresenceSubscription(string key, string channel, bool status, bool changes)
+        {
+            var request = new PresenceRequest();
+            request.Key = key;
+            request.Channel = channel;
+            request.Status = status;
+            request.Changes = changes;
+
+            this.Publish("emitter/", "presence", Encoding.UTF8.GetBytes(request.ToJson()));
+        }
         #endregion Presence Members
 
         #region Private Members
@@ -462,6 +471,15 @@ namespace Emitter
         {
             try
             {
+                if (!e.Topic.StartsWith("emitter"))
+                {
+                    // Invoke every handler matching the channel
+                    foreach (MessageHandler handler in this.Trie.Match(e.Topic))
+                        handler(e.Topic, e.Message);
+
+                    return;
+                }
+
                 // Did we receive a keygen response?
                 if (e.Topic == "emitter/keygen/")
                 {
@@ -474,19 +492,22 @@ namespace Emitter
                     }
 
                     // Call the response handler we have registered previously
+                    // TODO: get rid of the handler afterwards, or refac keygen
                     if (this.KeygenHandlers.ContainsKey(response.Channel))
                         ((KeygenHandler)this.KeygenHandlers[response.Channel])(response);
                     return;
+                }
+
+                if (e.Topic == "emitter/presence/")
+                {
+                    var presenceEvent = PresenceEvent.FromBinary(e.Message);
+                    Presence?.Invoke(presenceEvent);
                 }
             }
             catch (Exception ex)
             {
                 this.InvokeError(ex);
             }
-
-            // Invoke every handler matching the channel
-            foreach (MessageHandler handler in this.Trie.Match(e.Topic))
-                handler(e.Topic, e.Message);
         }
 
         /// <summary>

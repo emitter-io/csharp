@@ -5,15 +5,15 @@ using System.Text;
 
 namespace Emitter.Messages
 {
-    public class PresenceResponse
+    public class PresenceEvent
     {
         public int Request;
 
-        public PresenceEvent Event;
+        public PresenceEventType Event;
 
         public string Channel;
 
-        public int Time;
+        public long Time;
 
         public List<PresenceInfo> Who;
         
@@ -22,28 +22,39 @@ namespace Emitter.Messages
         /// </summary>
         /// <param name="json">The json string to deserialize from.</param>
         /// <returns></returns>
-        public static PresenceResponse FromJson(string json)
+        public static PresenceEvent FromJson(string json)
         {
             var map = JsonSerializer.DeserializeString(json) as Hashtable;
-            var response = new PresenceResponse();
+            var response = new Emitter.Messages.PresenceEvent();
 
-            response.Request = (int)map["req"];
+            //response.Request = (int)map["req"];
             response.Channel = (string)map["channel"];
-            response.Time = (int)map["time"];
+            response.Time = (long)map["time"];
 
             switch ((string)map["event"])
             {
+                case "status":
+                    response.Event = PresenceEventType.Status;
+                    break;
                 case "subscribe":
-                    response.Event = PresenceEvent.Subscribe;
+                    response.Event = PresenceEventType.Subscribe;
                     break;
                 case "unsubscribe":
-                    response.Event = PresenceEvent.Unsubscribe;
+                    response.Event = PresenceEventType.Unsubscribe;
                     break;
             }
 
             response.Who = new List<PresenceInfo>();
-            foreach (string infoString in (string[])map["who"])
-                response.Who.Add(PresenceInfo.FromJson(infoString));
+            var who = (ArrayList) map["who"];
+            for (int i = 0; i < who.Count; ++i)
+            {
+                //var infoString = (who[i]);
+                var info = new PresenceInfo();
+                info.Id = (string)map["id"];
+                if (map.ContainsKey("username"))
+                    info.Username = (string)map["username"];
+                response.Who.Add(info);
+            }
 
             return response;
         }
@@ -53,13 +64,15 @@ namespace Emitter.Messages
         /// </summary>
         /// <param name="message">The binary UTF-8 encoded string.</param>
         /// <returns></returns>
-        public static PresenceResponse FromBinary(byte[] message)
+        public static PresenceEvent FromBinary(byte[] message)
         {
             return FromJson(new string(Encoding.UTF8.GetChars(message)));
         }
 
-        public enum PresenceEvent
+        public enum PresenceEventType
         {
+            Unknown,
+            Status,
             Subscribe,
             Unsubscribe
         };

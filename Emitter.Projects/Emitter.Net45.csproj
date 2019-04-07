@@ -74,11 +74,11 @@
     <Compile Include="..\Emitter\Messages\MqttMsgUnsubscribe.cs" />
     <Compile Include="..\Emitter\Messages\MqttMsgUnsubscribedEventArgs.cs" />
     <Compile Include="..\Emitter\Messages\MqttMsgUnsubscribeEventArgs.cs" />
+    <Compile Include="..\Emitter\Messages\PresenceEvent.cs">
+      <Link>PresenceEvent.cs</Link>
+    </Compile>
     <Compile Include="..\Emitter\Messages\PresenceRequest.cs">
       <Link>PresenceRequest.cs</Link>
-    </Compile>
-    <Compile Include="..\Emitter\Messages\PresenceResponse.cs">
-      <Link>PresenceResponse.cs</Link>
     </Compile>
     <Compile Include="..\Emitter\MqttClient.cs" />
     <Compile Include="..\Emitter\MqttSecurity.cs" />
