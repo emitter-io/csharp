@@ -621,10 +621,6 @@ namespace System
         #endregion Private Static Helper Methods
     }
 
-    public delegate MessageHandler AddFunc();
-
-    public delegate MessageHandler UpdateFunc(MessageHandler old);
-
     /// <summary>
     /// Represents a number style.
     /// </summary>

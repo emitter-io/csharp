@@ -54,8 +54,8 @@ namespace Emitter
     {
         #region Constructors
         private readonly MqttClient Client;
-        private readonly ReverseTrie Trie = new ReverseTrie(-1);
-        private readonly ReverseTrie PresenceTrie = new ReverseTrie(-1);
+        private readonly ReverseTrie<MessageHandler> Trie = new ReverseTrie<MessageHandler>(-1);
+        private readonly ReverseTrie<PresenceHandler> PresenceTrie = new ReverseTrie<PresenceHandler>(-1);
         private string DefaultKey = null;
 
         /// <summary>

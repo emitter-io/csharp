@@ -3,17 +3,19 @@ using System.Collections;
 
 namespace Emitter.Utility
 {
-    #region ReverseTrie
-
-    /// <summary>
+ /// <summary>
     /// Represents a trie with a reverse-pattern search.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    internal class ReverseTrie
+    internal class ReverseTrie<T> where T : class
     {
+        // TODO
+        public delegate T AddFunc();
+        public delegate T UpdateFunc(T old);
+
         private readonly Hashtable Children;
         private readonly short Level = 0;
-        private MessageHandler Value = default(MessageHandler);
+        private T Value = default(T);
 
         /// <summary>
         /// Constructs a node of the trie.
@@ -30,7 +32,7 @@ namespace Emitter.Utility
         /// </summary>
         /// <param name="channel"></param>
         /// <param name="value"></param>
-        public void RegisterHandler(string channel, MessageHandler value)
+        public void RegisterHandler(string channel, T value)
         {
             // Add the value or replace it.
             this.AddOrUpdate(CreateKey(channel), 0, () => value, (old) => value);
@@ -42,7 +44,7 @@ namespace Emitter.Utility
         /// <param name="channel"></param>
         public void UnregisterHandler(string channel)
         {
-            MessageHandler removed;
+            T removed;
             this.TryRemove(CreateKey(channel), 0, out removed);
         }
 
@@ -68,7 +70,7 @@ namespace Emitter.Utility
             matches.Push(this);
             while (matches.Count != 0)
             {
-                var current = matches.Pop() as ReverseTrie;
+                var current = matches.Pop() as ReverseTrie<T>;
                 if (current.Value != default(object))
                     result.Add(current.Value);
 
@@ -85,7 +87,7 @@ namespace Emitter.Utility
             return result;
         }
 
-        #region Private Members
+        
 
         /// <summary>
         /// Creates a query for the trie from the channel name.
@@ -107,6 +109,7 @@ namespace Emitter.Utility
         {
             if (position >= key.Length)
             {
+                // TODO check lock's position
                 lock (this)
                 {
                     // There's already a value
@@ -120,14 +123,14 @@ namespace Emitter.Utility
             }
 
             // Create a child
-            var child = Utils.GetOrAddToHashtable(Children, key[position], new ReverseTrie((short)position)) as ReverseTrie;
+            var child = Utils.GetOrAddToHashtable(Children, key[position], new ReverseTrie<T>((short)position)) as ReverseTrie<T>;
             return child.AddOrUpdate(key, position + 1, addFunc, updateFunc);
         }
 
         /// <summary>
         /// Attempts to remove a specific key from the Trie.
         /// </summary>
-        private bool TryRemove(string[] key, int position, out MessageHandler value)
+        private bool TryRemove(string[] key, int position, out T value)
         {
             if (position >= key.Length)
             {
@@ -135,10 +138,10 @@ namespace Emitter.Utility
                 {
                     // There's no value
                     value = this.Value;
-                    if (this.Value == default(MessageHandler))
+                    if (this.Value == default(T))
                         return false;
 
-                    this.Value = default(MessageHandler);
+                    this.Value = default(T);
                     return true;
                 }
             }
@@ -146,14 +149,10 @@ namespace Emitter.Utility
             // Remove from the child
             object child;
             if (Utils.TryGetValueFromHashtable(Children, key[position], out child))
-                return ((ReverseTrie)child).TryRemove(key, position + 1, out value);
+                return ((ReverseTrie<T>)child).TryRemove(key, position + 1, out value);
 
-            value = default(MessageHandler);
+            value = default(T);
             return false;
         }
-
-        #endregion Private Members
     }
-
-    #endregion ReverseTrie
 }
