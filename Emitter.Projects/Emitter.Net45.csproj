@@ -39,6 +39,18 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\Emitter\Emitter.cs" />
+    <Compile Include="..\Emitter\Emitter.KeyGen.cs">
+      <Link>Emitter.KeyGen.cs</Link>
+    </Compile>
+    <Compile Include="..\Emitter\Emitter.Presence.cs">
+      <Link>Emitter.Presence.cs</Link>
+    </Compile>
+    <Compile Include="..\Emitter\Emitter.Publish.cs">
+      <Link>Emitter.Publish.cs</Link>
+    </Compile>
+    <Compile Include="..\Emitter\Emitter.Subscribe.cs">
+      <Link>Emitter.Subscribe.cs</Link>
+    </Compile>
     <Compile Include="..\Emitter\Exceptions\MqttClientException.cs" />
     <Compile Include="..\Emitter\Exceptions\EmitterException.cs" />
     <Compile Include="..\Emitter\Exceptions\MqttConnectionException.cs" />
@@ -90,6 +102,9 @@
     <Compile Include="..\Emitter\Session\MqttSession.cs" />
     <Compile Include="..\Emitter\Utility\Options.cs">
       <Link>Options.cs</Link>
+    </Compile>
+    <Compile Include="..\Emitter\Utility\ReverseTrie.cs">
+      <Link>ReverseTrie.cs</Link>
     </Compile>
     <Compile Include="..\Emitter\Utility\Trace.cs" />
     <Compile Include="..\Emitter\Utility\Extensions.cs" />
