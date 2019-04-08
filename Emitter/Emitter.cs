@@ -253,7 +253,10 @@ namespace Emitter
                 if (e.Topic == "emitter/presence/")
                 {
                     var presenceEvent = PresenceEvent.FromBinary(e.Message);
-                    Presence?.Invoke(presenceEvent);
+                    //Presence?.Invoke(presenceEvent);
+                    // Invoke every handler matching the channel
+                    foreach (PresenceHandler handler in this.PresenceTrie.Match(presenceEvent.Channel))
+                        handler(presenceEvent);
                 }
             }
             catch (Exception ex)
