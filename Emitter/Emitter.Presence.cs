@@ -50,7 +50,7 @@ namespace Emitter
 
             this.Publish("emitter/", "presence", Encoding.UTF8.GetBytes(request.ToJson()));
         }
-        /*
+        
         public void PresenceStatus(string channel, PresenceHandler handler)
         {
             if (this.DefaultKey == null)
@@ -67,11 +67,11 @@ namespace Emitter
             request.Key = key;
             request.Channel = channel;
             request.Status = true;
-            request.Changes = true;
+            request.Changes = null;
 
             this.Publish("emitter/", "presence", Encoding.UTF8.GetBytes(request.ToJson()));
         }
-        */
+        
         #endregion Presence Members
     }
 }

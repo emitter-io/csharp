@@ -27,7 +27,7 @@ namespace Emitter.Messages
         /// <summary>
         /// Get or sets whether we want to receive change events.
         /// </summary>
-        public bool Changes;
+        public bool? Changes;
 
         /// <summary>
         /// Converts the request to JSON format.

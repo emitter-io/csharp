@@ -45,17 +45,28 @@ namespace Emitter.Messages
             }
 
             response.Who = new List<PresenceInfo>();
-            var who = (ArrayList) map["who"];
-            for (int i = 0; i < who.Count; ++i)
+            if (response.Event == PresenceEventType.Status)
             {
-                //var infoString = (who[i]);
+                var whoList = (ArrayList)map["who"];
+                for (int i = 0; i < whoList.Count; ++i)
+                {
+                    var info = new PresenceInfo();
+                    var who = (Hashtable) whoList[i];
+                    info.Id = (string)who["id"];
+                    if (who.ContainsKey("username"))
+                        info.Username = (string)who["username"];
+                    response.Who.Add(info);
+                }
+            }
+            else
+            {
+                var who = (Hashtable)map["who"];
                 var info = new PresenceInfo();
-                info.Id = (string)map["id"];
-                if (map.ContainsKey("username"))
-                    info.Username = (string)map["username"];
+                info.Id = (string)who["id"];
+                if (who.ContainsKey("username"))
+                    info.Username = (string)who["username"];
                 response.Who.Add(info);
             }
-
             return response;
         }
 
