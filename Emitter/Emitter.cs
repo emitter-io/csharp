@@ -280,25 +280,10 @@ namespace Emitter
             }
         }
         #region Private Members
-        /// <summary>
-        /// Formats the channel.
-        /// </summary>
-        /// <param name="key">The key to add.</param>
-        /// <param name="channel">The channel name.</param>
-        /// <param name="options">The options.</param>
-        /// <returns></returns>
-        private string FormatChannel(string key, string channel, params string[] options)
+
+        private string FormatOptions(string[] options)
         {
-            // Prefix with the key
-            var formatted = key.EndsWith("/")
-                ? key + channel
-                : key + "/" + channel;
-
-            // Add trailing slash
-            if (!formatted.EndsWith("/"))
-                formatted += "/";
-
-            // Add options
+            string formatted = "";
             if (options != null && options.Length > 0)
             {
                 formatted += "?";
@@ -313,18 +298,47 @@ namespace Emitter
                 }
             }
 
-            // We're done compiling the channel name
             return formatted;
         }
 
-        private string FormatChannelLink(string key, string channel, params string[] options)
+        /// <summary>
+        /// Formats the channel.
+        /// </summary>
+        /// <param name="key">The key to add.</param>
+        /// <param name="channel">The channel name.</param>
+        /// <param name="options">The options.</param>
+        /// <returns></returns>
+        private string FormatChannel(string key, string channel, params string[] options)
         {
-            return "";
+            string k = key.Trim('/');
+            string c = channel.Trim('/');
+            string o = FormatOptions(options);
+
+            var formatted = string.Format("{0}/{1}/{2}", k, c, o);
+
+            return formatted;
+        }
+
+        private string FormatChannelLink(string channel, params string[] options)
+        {
+            string c = channel.Trim('/');
+            string o = FormatOptions(options);
+
+            var formatted = string.Format("{0}/{1}", c, o);
+
+            return formatted;
         }
 
         private string FormatChannelShare(string key, string channel, string shareGroup, params string[] options)
         {
-            return "";
+            string k = key.Trim('/');
+            string c = channel.Trim('/');
+            string s = shareGroup.Trim('/');
+            string o = FormatOptions(options);
+
+            var formatted = string.Format("{0}/$share/{1}/{2}/{3}", k, s, c, o);
+
+            return formatted;
         }
 
         private void GetHeader(string[] options, out bool retain, out byte qos)
