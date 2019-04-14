@@ -33,11 +33,6 @@ namespace Emitter
     public delegate void MessageHandler(string channel, byte[] message);
 
     /// <summary>
-    /// Represents a Presence handler callback.
-    /// </summary>
-    public delegate void PresenceHandler(PresenceEvent presenceResponse);
-
-    /// <summary>
     /// Delegate that defines event handler for client/peer disconnection
     /// </summary>
     public delegate void DisconnectHandler(object sender, EventArgs e);
@@ -61,7 +56,6 @@ namespace Emitter
         #region Constructors
         private readonly MqttClient Client;
         private readonly ReverseTrie<MessageHandler> Trie = new ReverseTrie<MessageHandler>(-1);
-        private readonly ReverseTrie<PresenceHandler> PresenceTrie = new ReverseTrie<PresenceHandler>(-1);
         private string DefaultKey = null;
 
         /// <summary>
@@ -321,6 +315,16 @@ namespace Emitter
 
             // We're done compiling the channel name
             return formatted;
+        }
+
+        private string FormatChannelLink(string key, string channel, params string[] options)
+        {
+            return "";
+        }
+
+        private string FormatChannelShare(string key, string channel, string shareGroup, params string[] options)
+        {
+            return "";
         }
 
         private void GetHeader(string[] options, out bool retain, out byte qos)

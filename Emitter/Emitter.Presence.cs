@@ -1,5 +1,6 @@
 using System.Text;
 using Emitter.Messages;
+using Emitter.Utility;
 
 namespace Emitter
 {
@@ -7,7 +8,12 @@ namespace Emitter
     {
         #region Presence Members
 
-        //public event PresenceHandler Presence;
+        /// <summary>
+        /// Represents a Presence handler callback.
+        /// </summary>
+        public delegate void PresenceHandler(PresenceEvent presenceResponse);
+
+        private readonly ReverseTrie<PresenceHandler> PresenceTrie = new ReverseTrie<PresenceHandler>(-1);
 
         public void PresenceSubscribe(string channel, bool status, PresenceHandler handler)
         {
