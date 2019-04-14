@@ -42,6 +42,9 @@
     <Compile Include="..\Emitter\Emitter.KeyGen.cs">
       <Link>Emitter.KeyGen.cs</Link>
     </Compile>
+    <Compile Include="..\Emitter\Emitter.Link.cs">
+      <Link>Emitter.Link.cs</Link>
+    </Compile>
     <Compile Include="..\Emitter\Emitter.Me.cs">
       <Link>Emitter.Me.cs</Link>
     </Compile>
@@ -69,6 +72,9 @@
     </Compile>
     <Compile Include="..\Emitter\Messages\KeygenResponse.cs" />
     <Compile Include="..\Emitter\Messages\KeygenRequest.cs" />
+    <Compile Include="..\Emitter\Messages\LinkRequest.cs">
+      <Link>LinkRequest.cs</Link>
+    </Compile>
     <Compile Include="..\Emitter\Messages\MeResponse.cs">
       <Link>MeResponse.cs</Link>
     </Compile>
@@ -117,7 +123,6 @@
     </Compile>
     <Compile Include="..\Emitter\Utility\Trace.cs" />
     <Compile Include="..\Emitter\Utility\Extensions.cs" />
-    <Compile Include="LinkRequest.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
