@@ -42,6 +42,9 @@
     <Compile Include="..\Emitter\Emitter.KeyGen.cs">
       <Link>Emitter.KeyGen.cs</Link>
     </Compile>
+    <Compile Include="..\Emitter\Emitter.Me.cs">
+      <Link>Emitter.Me.cs</Link>
+    </Compile>
     <Compile Include="..\Emitter\Emitter.Presence.cs">
       <Link>Emitter.Presence.cs</Link>
     </Compile>
@@ -66,6 +69,9 @@
     </Compile>
     <Compile Include="..\Emitter\Messages\KeygenResponse.cs" />
     <Compile Include="..\Emitter\Messages\KeygenRequest.cs" />
+    <Compile Include="..\Emitter\Messages\MeResponse.cs">
+      <Link>MeResponse.cs</Link>
+    </Compile>
     <Compile Include="..\Emitter\Messages\MqttMsgBase.cs" />
     <Compile Include="..\Emitter\Messages\MqttMsgConnack.cs" />
     <Compile Include="..\Emitter\Messages\MqttMsgConnect.cs" />

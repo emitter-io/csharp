@@ -48,6 +48,12 @@ namespace Emitter
     public delegate void ErrorHandler(object sender, Exception e);
 
     /// <summary>
+    /// Represents a Me event handler.
+    /// </summary>
+    /// <param name="meResponse"></param>
+    public delegate void MeHandler(MeResponse meResponse);
+
+    /// <summary>
     /// Represents emitter.io MQTT-based client.
     /// </summary>
     public partial class Connection : IDisposable
@@ -266,6 +272,12 @@ namespace Emitter
                     var emitterException = new EmitterException((EmitterEventCode) errorEvent.Status, errorEvent.Message);
 
                     InvokeError(emitterException);
+                }
+
+                if (e.Topic == "emitter/me/")
+                {
+                    var meResponse = MeResponse.FromBinary(e.Message);
+                    Me?.Invoke(meResponse);
                 }
             }
             catch (Exception ex)
