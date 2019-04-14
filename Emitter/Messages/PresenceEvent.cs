@@ -7,7 +7,7 @@ namespace Emitter.Messages
 {
     public class PresenceEvent
     {
-        public int Request;
+        public long? RequestId;
 
         public PresenceEventType Event;
 
@@ -27,7 +27,7 @@ namespace Emitter.Messages
             var map = JsonSerializer.DeserializeString(json) as Hashtable;
             var response = new Emitter.Messages.PresenceEvent();
 
-            //response.Request = (int)map["req"];
+            if (map.ContainsKey("req")) response.RequestId = (long)map["req"];
             response.Channel = (string)map["channel"];
             response.Time = (long)map["time"];
 
