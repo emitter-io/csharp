@@ -44,14 +44,9 @@ namespace Benchmarks
 
     public static class FormatChannel_Trim
     {
-        public static string FormatChannel(string key, string channel, params string[] options)
+        private static string FormatOptions(string[] options)
         {
-            string k = key.Trim('/');
-            string c = channel.Trim('/');
-
-            var formatted = string.Format("{0}/{1}/", key, channel);
-
-            // Add options
+            string formatted = "";
             if (options != null && options.Length > 0)
             {
                 formatted += "?";
@@ -65,6 +60,17 @@ namespace Benchmarks
                         formatted += "&";
                 }
             }
+
+            return formatted;
+        }
+
+        public static string FormatChannel(string key, string channel, params string[] options)
+        {
+            string k = key.Trim('/');
+            string c = channel.Trim('/');
+            string o = FormatOptions(options);
+
+            var formatted = string.Format("{0}/{1}/{2}", k, c, o);
 
             // We're done compiling the channel name
             return formatted;
