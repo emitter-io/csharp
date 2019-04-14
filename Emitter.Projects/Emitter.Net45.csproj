@@ -61,6 +61,9 @@
     <Compile Include="..\Emitter\Internal\MsgPublishedInternalEvent.cs" />
     <Compile Include="..\Emitter\Json\JsonParser.cs" />
     <Compile Include="..\Emitter\Json\JsonSerializer.cs" />
+    <Compile Include="..\Emitter\Messages\ErrorEvent.cs">
+      <Link>ErrorEvent.cs</Link>
+    </Compile>
     <Compile Include="..\Emitter\Messages\KeygenResponse.cs" />
     <Compile Include="..\Emitter\Messages\KeygenRequest.cs" />
     <Compile Include="..\Emitter\Messages\MqttMsgBase.cs" />
