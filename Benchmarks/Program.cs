@@ -42,6 +42,35 @@ namespace Benchmarks
         }
     }
 
+    public static class FormatChannel_Trim
+    {
+        public static string FormatChannel(string key, string channel, params string[] options)
+        {
+            string k = key.Trim('/');
+            string c = channel.Trim('/');
+
+            var formatted = string.Format("{0}/{1}/", key, channel);
+
+            // Add options
+            if (options != null && options.Length > 0)
+            {
+                formatted += "?";
+                for (int i = 0; i < options.Length; ++i)
+                {
+                    if (options[i][0] == '+')
+                        continue;
+
+                    formatted += options[i];
+                    if (i + 1 < options.Length)
+                        formatted += "&";
+                }
+            }
+
+            // We're done compiling the channel name
+            return formatted;
+        }
+    }
+
     public static class FormatChannel_StringBuilder
     {
         public static string FormatChannel(string key, string channel, params string[] options)
@@ -78,6 +107,9 @@ namespace Benchmarks
 
         [Benchmark]
         public string stringBuilder() => FormatChannel_StringBuilder.FormatChannel("EckDAy4LHt_T0eTPSBK_0dmOAGhakMgJ", "test/", "ttl=3600", "me=1");
+
+        [Benchmark]
+        public string trim() => FormatChannel_Trim.FormatChannel("EckDAy4LHt_T0eTPSBK_0dmOAGhakMgJ", "test/", "ttl=3600", "me=1");
 
     }
 
