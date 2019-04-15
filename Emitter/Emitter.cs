@@ -43,12 +43,6 @@ namespace Emitter
     public delegate void ErrorHandler(object sender, Exception e);
 
     /// <summary>
-    /// Represents a Me event handler.
-    /// </summary>
-    /// <param name="meResponse"></param>
-    public delegate void MeHandler(MeResponse meResponse);
-
-    /// <summary>
     /// Represents emitter.io MQTT-based client.
     /// </summary>
     public partial class Connection : IDisposable
