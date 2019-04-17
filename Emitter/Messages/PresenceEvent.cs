@@ -45,9 +45,9 @@ namespace Emitter.Messages
             }
 
             response.Who = new List<PresenceInfo>();
-            if (map["who"] is ArrayList)
+            if (map["who"] is ArrayList arrayWho)
             {
-                foreach (Hashtable who in (ArrayList)map["who"])
+                foreach (Hashtable who in arrayWho)
                 {
                     var info = new PresenceInfo();
                     info.Id = (string)who["id"];
@@ -56,9 +56,8 @@ namespace Emitter.Messages
                     response.Who.Add(info);
                 }
             }
-            else if (map["who"] is Hashtable)
+            else if (map["who"] is Hashtable who)
             {
-                var who = (Hashtable)map["who"];
                 var info = new PresenceInfo();
                 info.Id = (string)who["id"];
                 if (who.ContainsKey("username"))
