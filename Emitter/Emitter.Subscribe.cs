@@ -69,6 +69,17 @@ namespace Emitter
             // Subscribe
             return this.Client.Subscribe(new string[] { FormatChannel(key, channel, options) }, new byte[] { MqttMsgBase.QOS_LEVEL_AT_MOST_ONCE });
         }
+
+        public ushort SubscribeWithGroup(string key, string channel, string shareGroup, MessageHandler handler, params string[] options)
+        {
+            // Register the handler
+            this.Trie.RegisterHandler(channel, handler);
+
+            // Subscribe
+            return this.Client.Subscribe(new string[] { FormatChannelShare(key, channel, shareGroup, options) }, new byte[] { MqttMsgBase.QOS_LEVEL_AT_MOST_ONCE });
+        }
+
+
         #endregion Subscribe
 
         #region Unsubscribe
