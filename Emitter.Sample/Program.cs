@@ -12,16 +12,16 @@ namespace Emitter.Sample
     {
         static void Main(string[] args)
         {
-            //var channelKey = "LbrBtLmdqF-qyMQpFhfTBij9n7LwYnRT";
-            var channelKey = "EckDAy4LHt_T0eTPSBK_0dmOAGhakMgI";//local
+            var channelKey = "8jMLP9F859oDyqmJ3aV4aqnmFZpxApvb"; // not local
+            //var channelKey = "EckDAy4LHt_T0eTPSBK_0dmOAGhakMgI";//local
 
             //var channelKey = "EckDAy4LHt_T0eTPSBK_0dmOAGhakMgJ"; # fake, to generate error
 
             var channel = "test/";
             var shareGroup = "sg";
-            var shareGroupKey = "qQrtann17qNi3CTwW7N8F4OR9uAuQBHw";//local
+            var shareGroupKey = "qQrtann17qNi3CTwW7N8F4OR9uAuQBHw";//not local
 
-            using (var emitter = Connection.Establish("127.0.0.1", 8080, channelKey))
+            using (var emitter = Connection.Establish("api.emitter.io", 8080, channelKey))
             {
                 /*
                 // Generate a read-write key for our channel
