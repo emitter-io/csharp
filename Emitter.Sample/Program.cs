@@ -12,12 +12,14 @@ namespace Emitter.Sample
     {
         static void Main(string[] args)
         {
-            // var channelKey = "LbrBtLmdqF-qyMQpFhfTBij9n7LwYnRT";
-            var channelKey = "EckDAy4LHt_T0eTPSBK_0dmOAGhakMgI";
+            //var channelKey = "LbrBtLmdqF-qyMQpFhfTBij9n7LwYnRT";
+            var channelKey = "EckDAy4LHt_T0eTPSBK_0dmOAGhakMgI";//local
 
             //var channelKey = "EckDAy4LHt_T0eTPSBK_0dmOAGhakMgJ"; # fake, to generate error
 
             var channel = "test/";
+            var shareGroup = "sg";
+            var shareGroupKey = "qQrtann17qNi3CTwW7N8F4OR9uAuQBHw";//local
 
             using (var emitter = Connection.Establish("127.0.0.1", 8080, channelKey))
             {
@@ -28,8 +30,6 @@ namespace Emitter.Sample
                     Console.WriteLine("Generated Key: " + keygen.Key);
                 });
                 */
-                emitter.Me += (MeResponse me) => { Console.WriteLine(me.MyId); };
-                emitter.MeInfo();
 
                 //emitter.Presence += (PresenceEvent e) => { Console.WriteLine("Presence event " + e.Event + "."); };
                 //emitter.PresenceSubscription(channelKey, "chat", true);
@@ -38,15 +38,21 @@ namespace Emitter.Sample
                 emitter.PresenceStatus(channelKey, channel, (PresenceEvent e) => { Console.WriteLine("Presence event " + e.Event + "."); });
                 Thread.Sleep(1000);
                 // Handle chat messages
+                /*
                 emitter.On(channelKey, channel, (chan, msg) =>
                 {
                     Console.WriteLine(Encoding.UTF8.GetString(msg));
                 }, 5);
-
+                */
+                emitter.SubscribeWithGroup(shareGroupKey, channel, shareGroup,
+                    (chan, msg) => { Console.WriteLine(Encoding.UTF8.GetString(msg)); });
 
                 emitter.Link(channelKey, channel, "L0", false, true);
-
+                emitter.Link(channelKey, channel, "L1", false, true);
                 emitter.PublishWithLink("L0", "Link test");
+
+                emitter.Me += (MeResponse me) => { Console.WriteLine(me.MyId); };
+                emitter.MeInfo();
 
                 string text = "";
                 Console.WriteLine("Type to chat or type 'q' to exit...");
