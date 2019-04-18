@@ -26,20 +26,17 @@ namespace Emitter.Messages
             if (map.ContainsKey("req")) response.RequestId = (long)map["req"];
             response.MyId = (string)map["id"];
             response.Links = new List<ShortcutInfo>();
-
-            /* TODO links
-            if (map[""] is ArrayList)
+            
+            if (map["links"] is Hashtable links)
             {
-                foreach (Hashtable who in (ArrayList)map["who"])
+                foreach (var key in links.Keys)
                 {
                     var info = new ShortcutInfo();
-                    
-                    info.Shortcut = (string)who["id"];
-                    if (who.ContainsKey("username"))
-                        info.Username = (string)who["username"];
+                    info.Name = (string)key;
+                    info.Channel = (string)links[key];
                     response.Links.Add(info);
                 }
-            }*/
+            }
 
             return response;
         }
@@ -56,7 +53,7 @@ namespace Emitter.Messages
 
         public class ShortcutInfo
         {
-            public string Shortcut;
+            public string Name;
             public string Channel;
         }
 
