@@ -7,8 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Emitter.Net45", "Emitter.Pr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Emitter.WinRT", "Emitter.Projects\Emitter.WinRT.csproj", "{0238F0E3-A02B-428D-8A3F-410D8F15BB50}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Emitter.NetMf44", "Emitter.Projects\Emitter.NetMf44.csproj", "{61703A0B-C295-41C5-B139-C75606F992B2}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Emitter.Sample", "Emitter.Sample\Emitter.Sample.csproj", "{4BAE6AD4-ED2F-4F05-B822-266AF9FC5ADE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Emitter.Net451", "Emitter.Projects\Emitter.Net451.csproj", "{C0B70B3F-C47E-4D9F-84B6-9AB693223FC6}"
@@ -39,10 +37,6 @@ Global
 		{0238F0E3-A02B-428D-8A3F-410D8F15BB50}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0238F0E3-A02B-428D-8A3F-410D8F15BB50}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0238F0E3-A02B-428D-8A3F-410D8F15BB50}.Release|Any CPU.Build.0 = Release|Any CPU
-		{61703A0B-C295-41C5-B139-C75606F992B2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{61703A0B-C295-41C5-B139-C75606F992B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{61703A0B-C295-41C5-B139-C75606F992B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{61703A0B-C295-41C5-B139-C75606F992B2}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4BAE6AD4-ED2F-4F05-B822-266AF9FC5ADE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4BAE6AD4-ED2F-4F05-B822-266AF9FC5ADE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4BAE6AD4-ED2F-4F05-B822-266AF9FC5ADE}.Release|Any CPU.ActiveCfg = Release|Any CPU

@@ -11,7 +11,7 @@
     <iconUrl>https://raw.githubusercontent.com/emitter-io/csharp/master/Emitter.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Emitter is an MQTT client tailored for emitter.io service, allowing real-time publish subscribe. It supports full .Net Framework and WinRT platform (Windows 8+ and Windows Phone 8+).</description>
-    <summary>Emitter is an MQTT client tailored for emitter.io service, allowing real-time publish subscribe. It supports full .Net Framework, .Net Micro Framework and WinRT platform (Windows 8+ and Windows Phone 8+).</summary>
+    <summary>Emitter is an MQTT client tailored for emitter.io service, allowing real-time publish subscribe. It supports full .Net Framework and WinRT platform (Windows 8+ and Windows Phone 8+).</summary>
     <copyright>Misakai Ltd.</copyright>
     <tags>emitter mqtt queue messaging pubsub publish subscribe internetofthings iot cloud embedded netduino hardware winrt windows8 windows8.1 windowsphone windowsphone8.1 gadgeteer</tags>
     <dependencies>
