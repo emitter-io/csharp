@@ -21,7 +21,7 @@ namespace Emitter.Sample
             var shareGroup = "sg";
             var shareGroupKey = "qQrtann17qNi3CTwW7N8F4OR9uAuQBHw";//not local
 
-            using (var emitter = Connection.Establish("api.emitter.io", 8080, channelKey))
+            using (var emitter = Connection.Establish(channelKey, "api.emitter.io"))
             {
                 /*
                 // Generate a read-write key for our channel
