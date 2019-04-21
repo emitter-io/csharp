@@ -55,29 +55,42 @@ namespace Emitter
         /// <summary>
         /// Constructs a new emitter.io connection.
         /// </summary>
-        public Connection() : this(null, 0, null) { }
+        public Connection() : this(null, null, 0, true) { }
 
         /// <summary>
         /// Constructs a new emitter.io connection.
         /// </summary>
         /// <param name="defaultKey">The default key to use.</param>
-        public Connection(string defaultKey) : this(null, 0, defaultKey) { }
+        public Connection(string defaultKey) : this(defaultKey, null, 0, true) { }
 
         /// <summary>
         /// Constructs a new emitter.io connection.
         /// </summary>
-        /// <param name="broker">The broker hostname to use.</param>
         /// <param name="defaultKey">The default key to use.</param>
-        /// <param name="useTls">Whether we should use TLS security.</param>
-        public Connection(string broker, int brokerPort, string defaultKey)
+        /// <param name="broker">The address of the broker.</param>
+        /// <param name="secure">Whether the connection has to be secure.</param>
+        public Connection(string defaultKey, string broker, bool secure=true) : this(defaultKey, broker, 0, secure) { }
+
+        /// <summary>
+        /// Constructs a new emitter.io connection.
+        /// </summary>
+        /// <param name="defaultKey">The default key to use.</param>
+        /// <param name="broker">The address of the broker.</param>
+        /// <param name="brokerPort">The port of the broker to use.</param>
+        /// <param name="secure">Whether the connection has to be secure.</param>
+        public Connection(string defaultKey, string broker, int brokerPort, bool secure=true)
         {
             if (broker == null)
                 broker = "api.emitter.io";
             if (brokerPort <= 0)
-                brokerPort = MqttSettings.MQTT_BROKER_DEFAULT_PORT;
+                brokerPort = secure ? 443 : 8080;
 
             this.DefaultKey = defaultKey;
-            this.Client = new MqttClient(broker, brokerPort);
+            if (secure)
+                this.Client = new MqttClient(broker, brokerPort, true, MqttSslProtocols.TLSv1_0, null, null);
+            else
+                this.Client = new MqttClient(broker, brokerPort);
+
             this.Client.MqttMsgPublishReceived += OnMessageReceived;
             this.Client.ConnectionClosed += OnDisconnect;
         }
@@ -117,17 +130,12 @@ namespace Emitter
         #region Static Members
 
         /// <summary>
-        /// Gets the default instance of the client.
-        /// </summary>
-        public static readonly Connection Default = new Connection();
-
-        /// <summary>
         /// Establishes a new connection by creating the connection instance and connecting to it.
         /// </summary>
         /// <returns>The connection state.</returns>
         public static Connection Establish()
         {
-            return Establish(null, 0, null);
+            return Establish(null, null, 0, true);
         }
 
         /// <summary>
@@ -137,7 +145,12 @@ namespace Emitter
         /// <returns>The connection state.</returns>
         public static Connection Establish(string defaultKey)
         {
-            return Establish(null, 0, defaultKey);
+            return Establish(defaultKey, null, 0, true);
+        }
+
+        public static Connection Establish(string defaultKey, string broker, bool secure=true)
+        {
+            return Establish(defaultKey, broker, 0, secure);
         }
 
         /// <summary>
@@ -145,12 +158,11 @@ namespace Emitter
         /// </summary>
         /// <param name="brokerHostName">The broker hostname to use.</param>
         /// <param name="defaultKey">The default key to use.</param>
-        /// <param name="useTls">Whether we should use TLS security.</param>
         /// <returns>The connection state.</returns>
-        public static Connection Establish(string brokerHostName, int brokerPort, string defaultKey)
+        public static Connection Establish(string defaultKey, string broker, int brokerPort, bool secure=true)
         {
             // Create the connection
-            var conn = new Connection(brokerHostName, brokerPort, defaultKey);
+            var conn = new Connection(defaultKey, broker, brokerPort, secure);
 
             // Connect
             conn.Connect();
