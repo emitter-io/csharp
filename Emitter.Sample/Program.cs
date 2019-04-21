@@ -44,8 +44,12 @@ namespace Emitter.Sample
                     Console.WriteLine(Encoding.UTF8.GetString(msg));
                 }, 5);
                 */
-                emitter.SubscribeWithGroup(shareGroupKey, channel, shareGroup,
-                    (chan, msg) => { Console.WriteLine(Encoding.UTF8.GetString(msg)); });
+                //emitter.SubscribeWithGroup(shareGroupKey, channel, shareGroup, (chan, msg) => { Console.WriteLine(Encoding.UTF8.GetString(msg)); });
+                emitter.Subscribe(channel,
+                    (chan, msg) => { Console.WriteLine(Encoding.UTF8.GetString(msg)); },
+                    Options.WithFrom(DateTime.UtcNow.AddHours(-1)),
+                    Options.WithUntil(DateTime.UtcNow),
+                    Options.WithLast(10_000));
 
                 emitter.Link(channelKey, channel, "L0", false, true);
                 emitter.Link(channelKey, channel, "L1", false, true);
@@ -60,7 +64,7 @@ namespace Emitter.Sample
                 {
                     text = Console.ReadLine();
                     //emitter.Publish(channelKey, "chat", text, Options.WithRetain());
-                    emitter.Publish(channelKey, channel, text);
+                    emitter.Publish(channelKey, channel, text, Options.WithTTL(3600));
                 }
                 while (text != "q");
             }
