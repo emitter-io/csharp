@@ -7,7 +7,7 @@ namespace Emitter.Utility
     /// Represents a trie with a reverse-pattern search.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    internal class ReverseTrie<T> where T : class
+    public class ReverseTrie<T> where T : class
     {
         // TODO
         public delegate T AddFunc();
@@ -48,46 +48,37 @@ namespace Emitter.Utility
             this.TryRemove(CreateKey(channel), 0, out removed);
         }
 
+        private ArrayList RecurMatch(string[] query, int posInQuery, Hashtable children)
+        {
+            var matches = new ArrayList();
+            if (posInQuery == query.Length)
+                return matches;
+            if (Utils.TryGetValueFromHashtable(children, "+", out object objPlusChildNode))
+            {
+                var childNode = objPlusChildNode as ReverseTrie<T>;
+                if (childNode.Value != default(T))
+                    matches.Add(childNode.Value);
+                matches.AddRange(RecurMatch(query, posInQuery + 1, childNode.Children));
+            }
+            if (Utils.TryGetValueFromHashtable(children, query[posInQuery], out object objQueryChildNode))
+            {
+                var childNode = objQueryChildNode as ReverseTrie<T>;
+                if (childNode.Value != default(T))
+                    matches.Add(childNode.Value);
+                matches.AddRange(RecurMatch(query, posInQuery + 1, childNode.Children));
+            }
+            return matches;
+        }
         /// <summary>
         /// Retrieves a set of values.
         /// </summary>
-        /// <param name="query">The query to retrieve.</param>
-        /// <param name="position">The position.</param>
         /// <returns></returns>
-        public IEnumerable Match(string channel)
+        public ArrayList Match(string channel)
         {
-            // Matches
-            var result = new ArrayList();
-
-            // Get the query
             var query = CreateKey(channel);
-
-            // Get the matching stack
-            var matches = new Stack();
-
-            // Push the root
-            object childNode;
-            matches.Push(this);
-            while (matches.Count != 0)
-            {
-                var current = matches.Pop() as ReverseTrie<T>;
-                if (current.Value != default(object))
-                    result.Add(current.Value);
-
-                var level = current.Level + 1;
-                if (level >= query.Length)
-                    break;
-
-                if (Utils.TryGetValueFromHashtable(current.Children, "+", out childNode))
-                    matches.Push(childNode);
-                if (Utils.TryGetValueFromHashtable(current.Children, query[level], out childNode))
-                    matches.Push(childNode);
-            }
-
+            var result = RecurMatch(query, 0, this.Children);
             return result;
         }
-
-        
 
         /// <summary>
         /// Creates a query for the trie from the channel name.
@@ -96,7 +87,7 @@ namespace Emitter.Utility
         /// <returns></returns>
         public static string[] CreateKey(string channel)
         {
-            return channel.Split('/');
+            return channel.Trim('/').Split('/');
         }
 
         /// <summary>
@@ -107,13 +98,13 @@ namespace Emitter.Utility
         /// <returns></returns>
         private object AddOrUpdate(string[] key, int position, AddFunc addFunc, UpdateFunc updateFunc)
         {
-            if (position >= key.Length)
+            if (position == key.Length)
             {
                 // TODO check lock's position
                 lock (this)
                 {
                     // There's already a value
-                    if (this.Value != default(object))
+                    if (this.Value != default(T))
                         return updateFunc(this.Value);
 
                     // No value, add it
@@ -132,7 +123,7 @@ namespace Emitter.Utility
         /// </summary>
         private bool TryRemove(string[] key, int position, out T value)
         {
-            if (position >= key.Length)
+            if (position == key.Length)
             {
                 lock (this)
                 {
