@@ -42,5 +42,57 @@ namespace Tests
                 Assert.AreEqual(kv.Value, results.Count);
             }
         }
+
+        [TestMethod]
+        public void DeleteParent()
+        {
+            var reverseTrie = new ReverseTrie<MessageHandler>(-1);
+            reverseTrie.RegisterHandler("a/", (c, m) => { });
+            reverseTrie.RegisterHandler("a/b/c/", (c, m) => { });
+            reverseTrie.RegisterHandler("a/+/c/", (c, m) => { });
+
+            reverseTrie.UnregisterHandler("a/");
+
+            Assert.AreEqual(0, reverseTrie.Match("a/").Count);
+            Assert.AreEqual(0, reverseTrie.Match("a/b/").Count);
+            Assert.AreEqual(2, reverseTrie.Match("a/b/c/").Count);
+        }
+
+        [TestMethod]
+        public void DeleteChild()
+        {
+            var reverseTrie = new ReverseTrie<MessageHandler>(-1);
+            reverseTrie.RegisterHandler("a/", (c, m) => { });
+            reverseTrie.RegisterHandler("a/b/", (c, m) => { });
+
+            Assert.AreEqual(2, reverseTrie.Match("a/b/").Count);
+
+            reverseTrie.UnregisterHandler("a/b/");
+
+            Assert.AreEqual(1, reverseTrie.Match("a/b/").Count);
+        }
+
+        [TestMethod]
+        public void DeleteInexistentChild()
+        {
+            var reverseTrie = new ReverseTrie<MessageHandler>(-1);
+            reverseTrie.RegisterHandler("a/", (c, m) => { });
+            reverseTrie.RegisterHandler("a/b/", (c, m) => { });
+
+            reverseTrie.UnregisterHandler("c/");
+
+            Assert.AreEqual(2, reverseTrie.Match("a/b/").Count);
+        }
+
+        [TestMethod]
+        public void DeleteLonelyRoot()
+        {
+            var reverseTrie = new ReverseTrie<MessageHandler>(-1);
+            reverseTrie.RegisterHandler("a/", (c, m) => { });
+
+            reverseTrie.UnregisterHandler("a/");
+
+            Assert.AreEqual(0, reverseTrie.Match("a/").Count);
+        }
     }
 }
