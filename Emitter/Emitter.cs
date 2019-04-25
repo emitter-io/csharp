@@ -14,8 +14,10 @@ Contributors:
 
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Text;
-
+using System.Threading;
+using System.Threading.Tasks;
 using Emitter.Messages;
 using Emitter.Utility;
 
@@ -51,6 +53,11 @@ namespace Emitter
         private readonly MqttClient Client;
         private readonly ReverseTrie<MessageHandler> Trie = new ReverseTrie<MessageHandler>(-1);
         private string DefaultKey = null;
+
+        private readonly ConcurrentDictionary<int, TaskCompletionSource<byte[]>> _waitingRequests = new ConcurrentDictionary<int, TaskCompletionSource<byte[]>>();
+        private readonly ConcurrentDictionary<string, int> _requestNames = new ConcurrentDictionary<string, int>();
+        private readonly TimeSpan _defaultTimeout = TimeSpan.FromSeconds(5);
+
 
         /// <summary>
         /// Constructs a new emitter.io connection.
@@ -238,6 +245,30 @@ namespace Emitter
                     return;
                 }
 
+                //Did we receive a response to ExecuteAsync request?
+                if (_requestNames.ContainsKey(e.Topic))
+                {
+                    try
+                    {
+                        var message = Encoding.UTF8.GetString(e.Message);
+                        if (message.Contains("\"req\"")) //done for faster pre-check
+                        {
+                            Hashtable map = (Hashtable)JsonSerializer.DeserializeString(message);
+                            if (map.ContainsKey("req"))
+                            {
+                                if (_waitingRequests.TryRemove(int.Parse(map["req"].ToString()), out var tcs))
+                                {
+                                    if (!(tcs.Task.IsCompleted || tcs.Task.IsCanceled))
+                                    {
+                                        tcs.TrySetResult(e.Message);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception) { }
+                }
+
                 // Did we receive a keygen response?
                 if (e.Topic == "emitter/keygen/")
                 {
@@ -365,7 +396,67 @@ namespace Emitter
             }
         }
 
-        #endregion Private Members
+        #if (FX40 != true)
+        private async Task<byte[]> ExecuteAsync(TimeSpan timeout, string requestName, byte[] payload, CancellationToken cancellationToken)
+        {
+            if (requestName == null) throw new ArgumentNullException(nameof(requestName));
+            int messageId = 0;
+            try
+            {
+                if (_requestNames.ContainsKey(requestName))
+                {
+                    _requestNames[requestName] += 1;
+                }
+                else
+                {
+                    _requestNames[requestName] = 1;
+                }
+
+                var tcs = new TaskCompletionSource<byte[]>();
+                messageId = this.Client.Publish(requestName, payload, MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE, false);
+                if (!_waitingRequests.TryAdd(messageId, tcs))
+                {
+                    throw new InvalidOperationException();
+                }
+
+                using (var timeoutCts = new CancellationTokenSource(timeout))
+                using (var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeoutCts.Token))
+                {
+                    linkedCts.Token.Register(() =>
+                    {
+                        if (!tcs.Task.IsCompleted && !tcs.Task.IsFaulted && !tcs.Task.IsCanceled)
+                        {
+                            tcs.TrySetCanceled();
+                        }
+                    });
+
+                    try
+                    {
+                        var result = await tcs.Task.ConfigureAwait(false);
+                        timeoutCts.Cancel(false);
+                        return result;
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        if (timeoutCts.IsCancellationRequested && !cancellationToken.IsCancellationRequested)
+                        {
+                            throw new MqttTimeoutException();
+                        }
+                        else
+                        {
+                            throw;
+                        }
+                    }
+                }
+            }
+            finally
+            {
+                _waitingRequests.TryRemove(messageId, out _);
+            }
+        }
+        #endif
+
+#endregion Private Members
 
         #region IDisposable
 
