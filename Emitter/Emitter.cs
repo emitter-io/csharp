@@ -54,9 +54,9 @@ namespace Emitter
         private readonly ReverseTrie<MessageHandler> Trie = new ReverseTrie<MessageHandler>(-1);
         private string DefaultKey = null;
 
-        private readonly ConcurrentDictionary<int, TaskCompletionSource<byte[]>> _waitingRequests = new ConcurrentDictionary<int, TaskCompletionSource<byte[]>>();
-        private readonly ConcurrentDictionary<string, int> _requestNames = new ConcurrentDictionary<string, int>();
-        private readonly TimeSpan _defaultTimeout = TimeSpan.FromSeconds(5);
+        private readonly ConcurrentDictionary<int, TaskCompletionSource<byte[]>> WaitingRequests = new ConcurrentDictionary<int, TaskCompletionSource<byte[]>>();
+        private readonly ConcurrentDictionary<string, int> RequestNames = new ConcurrentDictionary<string, int>();
+        private readonly TimeSpan DefaultTimeout = TimeSpan.FromSeconds(5);
 
 
         /// <summary>
@@ -76,7 +76,7 @@ namespace Emitter
         /// <param name="defaultKey">The default key to use.</param>
         /// <param name="broker">The address of the broker.</param>
         /// <param name="secure">Whether the connection has to be secure.</param>
-        public Connection(string defaultKey, string broker, bool secure=true) : this(defaultKey, broker, 0, secure) { }
+        public Connection(string defaultKey, string broker, bool secure = true) : this(defaultKey, broker, 0, secure) { }
 
         /// <summary>
         /// Constructs a new emitter.io connection.
@@ -85,7 +85,7 @@ namespace Emitter
         /// <param name="broker">The address of the broker.</param>
         /// <param name="brokerPort">The port of the broker to use.</param>
         /// <param name="secure">Whether the connection has to be secure.</param>
-        public Connection(string defaultKey, string broker, int brokerPort, bool secure=true)
+        public Connection(string defaultKey, string broker, int brokerPort, bool secure = true)
         {
             if (broker == null)
                 broker = "api.emitter.io";
@@ -155,7 +155,7 @@ namespace Emitter
             return Establish(defaultKey, null, 0, true);
         }
 
-        public static Connection Establish(string defaultKey, string broker, bool secure=true)
+        public static Connection Establish(string defaultKey, string broker, bool secure = true)
         {
             return Establish(defaultKey, broker, 0, secure);
         }
@@ -166,7 +166,7 @@ namespace Emitter
         /// <param name="brokerHostName">The broker hostname to use.</param>
         /// <param name="defaultKey">The default key to use.</param>
         /// <returns>The connection state.</returns>
-        public static Connection Establish(string defaultKey, string broker, int brokerPort, bool secure=true)
+        public static Connection Establish(string defaultKey, string broker, int brokerPort, bool secure = true)
         {
             // Create the connection
             var conn = new Connection(defaultKey, broker, brokerPort, secure);
@@ -246,7 +246,7 @@ namespace Emitter
                 }
 
                 //Did we receive a response to ExecuteAsync request?
-                if (_requestNames.ContainsKey(e.Topic))
+                if (RequestNames.ContainsKey(e.Topic))
                 {
                     try
                     {
@@ -256,11 +256,14 @@ namespace Emitter
                             Hashtable map = (Hashtable)JsonSerializer.DeserializeString(message);
                             if (map.ContainsKey("req"))
                             {
-                                if (_waitingRequests.TryRemove(int.Parse(map["req"].ToString()), out var tcs))
+                                if (int.TryParse(map["req"].ToString(), out var reqId))
                                 {
-                                    if (!(tcs.Task.IsCompleted || tcs.Task.IsCanceled))
+                                    if (WaitingRequests.TryRemove(reqId, out var tcs))
                                     {
-                                        tcs.TrySetResult(e.Message);
+                                        if (!(tcs.Task.IsCompleted || tcs.Task.IsCanceled))
+                                        {
+                                            tcs.TrySetResult(e.Message);
+                                        }
                                     }
                                 }
                             }
@@ -300,7 +303,7 @@ namespace Emitter
                 if (e.Topic == "emitter/error/")
                 {
                     var errorEvent = ErrorEvent.FromBinary(e.Message);
-                    var emitterException = new EmitterException((EmitterEventCode) errorEvent.Status, errorEvent.Message);
+                    var emitterException = new EmitterException((EmitterEventCode)errorEvent.Status, errorEvent.Message);
 
                     InvokeError(emitterException);
                 }
@@ -396,25 +399,18 @@ namespace Emitter
             }
         }
 
-        #if (FX40 != true)
+#if (FX40 != true)
         private async Task<byte[]> ExecuteAsync(TimeSpan timeout, string requestName, byte[] payload, CancellationToken cancellationToken)
         {
             if (requestName == null) throw new ArgumentNullException(nameof(requestName));
             int messageId = 0;
             try
             {
-                if (_requestNames.ContainsKey(requestName))
-                {
-                    _requestNames[requestName] += 1;
-                }
-                else
-                {
-                    _requestNames[requestName] = 1;
-                }
+                RequestNames[requestName] = RequestNames.ContainsKey(requestName) ? RequestNames[requestName] + 1 : 1;
 
                 var tcs = new TaskCompletionSource<byte[]>();
                 messageId = this.Client.Publish(requestName, payload, MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE, false);
-                if (!_waitingRequests.TryAdd(messageId, tcs))
+                if (!WaitingRequests.TryAdd(messageId, tcs))
                 {
                     throw new InvalidOperationException();
                 }
@@ -451,12 +447,12 @@ namespace Emitter
             }
             finally
             {
-                _waitingRequests.TryRemove(messageId, out _);
+                WaitingRequests.TryRemove(messageId, out _);
             }
         }
-        #endif
+#endif
 
-#endregion Private Members
+        #endregion Private Members
 
         #region IDisposable
 

@@ -71,7 +71,7 @@ namespace Emitter
             request.Channel = channel;
             request.Type = securityAccess;
             request.Ttl = ttl;
-            if (timeout == null) timeout = _defaultTimeout;
+            if (timeout == null) timeout = DefaultTimeout;
             // Execute the request
             var response = await ExecuteAsync(timeout.Value, "emitter/keygen/", Encoding.UTF8.GetBytes(request.ToJson()), CancellationToken.None);
             if (response != null)
