@@ -94,7 +94,11 @@ namespace Emitter
 
             this.DefaultKey = defaultKey;
             if (secure)
+                #if !(WINDOWS_APP || WINDOWS_PHONE_APP)
                 this.Client = new MqttClient(broker, brokerPort, true, MqttSslProtocols.TLSv1_0, null, null);
+                #else
+                this.Client = new MqttClient(broker, brokerPort, true, MqttSslProtocols.TLSv1_0);
+                #endif
             else
                 this.Client = new MqttClient(broker, brokerPort);
 
@@ -102,9 +106,9 @@ namespace Emitter
             this.Client.ConnectionClosed += OnDisconnect;
         }
 
-        #endregion Constructors
+#endregion Constructors
 
-        #region Error Members
+#region Error Members
 
         /// <summary>
         /// Occurs when an error occurs.
@@ -132,9 +136,9 @@ namespace Emitter
             InvokeError(EmitterException.FromStatus(status));
         }
 
-        #endregion Error Members
+#endregion Error Members
 
-        #region Static Members
+#region Static Members
 
         /// <summary>
         /// Establishes a new connection by creating the connection instance and connecting to it.
@@ -178,9 +182,9 @@ namespace Emitter
             return conn;
         }
 
-        #endregion Static Members
+#endregion Static Members
 
-        #region Connect / Disconnect Members
+#region Connect / Disconnect Members
 
         /// <summary>
         /// Occurs when the client was disconnected.
@@ -222,7 +226,7 @@ namespace Emitter
             this.Client.Disconnect();
         }
 
-        #endregion Connect / Disconnect Members
+#endregion Connect / Disconnect Members
 
         //public event PresenceHandler Presence;
 
@@ -250,7 +254,7 @@ namespace Emitter
                 {
                     try
                     {
-                        var message = Encoding.UTF8.GetString(e.Message);
+                        var message = new string(Encoding.UTF8.GetChars(e.Message));
                         if (message.Contains("\"req\"")) //done for faster pre-check
                         {
                             Hashtable map = (Hashtable)JsonSerializer.DeserializeString(message);
@@ -319,7 +323,7 @@ namespace Emitter
                 this.InvokeError(ex);
             }
         }
-        #region Private Members
+#region Private Members
 
         private string FormatOptions(string[] options)
         {
@@ -452,9 +456,9 @@ namespace Emitter
         }
 #endif
 
-        #endregion Private Members
+#endregion Private Members
 
-        #region IDisposable
+#region IDisposable
 
         /// <summary>
         /// Disposes the connection.
@@ -486,6 +490,6 @@ namespace Emitter
             this.Dispose(false);
         }
 
-        #endregion IDisposable
+#endregion IDisposable
     }
 }

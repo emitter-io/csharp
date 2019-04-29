@@ -76,8 +76,8 @@ namespace Emitter
             var response = await ExecuteAsync(timeout.Value, "emitter/keygen/", Encoding.UTF8.GetBytes(request.ToJson()), CancellationToken.None);
             if (response != null)
             {
-                var map = JsonSerializer.DeserializeString(Encoding.UTF8.GetString(response)) as Hashtable;
-                if (map.ContainsKey("key")) return map["key"].ToString();
+                var keygenResponse = KeygenResponse.FromBinary(response);
+                return keygenResponse.Key;
             }
             return "";
         }

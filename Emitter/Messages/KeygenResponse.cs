@@ -49,9 +49,9 @@ namespace Emitter.Messages
             var map = JsonSerializer.DeserializeString(json) as Hashtable;
             var response = new KeygenResponse();
 
-            response.Key = (string)map["key"];
-            response.Channel = (string)map["channel"];
-            response.Status = Convert.ToInt32(map["status"].ToString());
+            if (map.ContainsKey("key")) response.Key = (string)map["key"];
+            if (map.ContainsKey("channel")) response.Channel = (string)map["channel"];
+            if (map.ContainsKey("status")) response.Status = Convert.ToInt32(map["status"].ToString());
             
             return response;
         }
