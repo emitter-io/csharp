@@ -274,6 +274,7 @@ namespace Emitter
                         }
                     }
                     catch (Exception) { }
+                    return;
                 }
 
                 // Did we receive a keygen response?
@@ -310,12 +311,15 @@ namespace Emitter
                     var emitterException = new EmitterException((EmitterEventCode)errorEvent.Status, errorEvent.Message);
 
                     InvokeError(emitterException);
+                    return;
                 }
 
                 if (e.Topic == "emitter/me/")
                 {
                     var meResponse = MeResponse.FromBinary(e.Message);
                     Me?.Invoke(meResponse);
+       
+                    return;
                 }
             }
             catch (Exception ex)
