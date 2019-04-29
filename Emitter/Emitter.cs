@@ -14,8 +14,10 @@ Contributors:
 
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Text;
-
+using System.Threading;
+using System.Threading.Tasks;
 using Emitter.Messages;
 using Emitter.Utility;
 
@@ -52,6 +54,11 @@ namespace Emitter
         private readonly ReverseTrie<MessageHandler> Trie = new ReverseTrie<MessageHandler>(-1);
         private string DefaultKey = null;
 
+        private readonly ConcurrentDictionary<int, TaskCompletionSource<byte[]>> WaitingRequests = new ConcurrentDictionary<int, TaskCompletionSource<byte[]>>();
+        private readonly ConcurrentDictionary<string, int> RequestNames = new ConcurrentDictionary<string, int>();
+        private readonly TimeSpan DefaultTimeout = TimeSpan.FromSeconds(5);
+
+
         /// <summary>
         /// Constructs a new emitter.io connection.
         /// </summary>
@@ -69,7 +76,7 @@ namespace Emitter
         /// <param name="defaultKey">The default key to use.</param>
         /// <param name="broker">The address of the broker.</param>
         /// <param name="secure">Whether the connection has to be secure.</param>
-        public Connection(string defaultKey, string broker, bool secure=true) : this(defaultKey, broker, 0, secure) { }
+        public Connection(string defaultKey, string broker, bool secure = true) : this(defaultKey, broker, 0, secure) { }
 
         /// <summary>
         /// Constructs a new emitter.io connection.
@@ -78,7 +85,7 @@ namespace Emitter
         /// <param name="broker">The address of the broker.</param>
         /// <param name="brokerPort">The port of the broker to use.</param>
         /// <param name="secure">Whether the connection has to be secure.</param>
-        public Connection(string defaultKey, string broker, int brokerPort, bool secure=true)
+        public Connection(string defaultKey, string broker, int brokerPort, bool secure = true)
         {
             if (broker == null)
                 broker = "api.emitter.io";
@@ -148,7 +155,7 @@ namespace Emitter
             return Establish(defaultKey, null, 0, true);
         }
 
-        public static Connection Establish(string defaultKey, string broker, bool secure=true)
+        public static Connection Establish(string defaultKey, string broker, bool secure = true)
         {
             return Establish(defaultKey, broker, 0, secure);
         }
@@ -159,7 +166,7 @@ namespace Emitter
         /// <param name="brokerHostName">The broker hostname to use.</param>
         /// <param name="defaultKey">The default key to use.</param>
         /// <returns>The connection state.</returns>
-        public static Connection Establish(string defaultKey, string broker, int brokerPort, bool secure=true)
+        public static Connection Establish(string defaultKey, string broker, int brokerPort, bool secure = true)
         {
             // Create the connection
             var conn = new Connection(defaultKey, broker, brokerPort, secure);
@@ -238,6 +245,33 @@ namespace Emitter
                     return;
                 }
 
+                //Did we receive a response to ExecuteAsync request?
+                if (RequestNames.ContainsKey(e.Topic))
+                {
+                    try
+                    {
+                        var message = Encoding.UTF8.GetString(e.Message);
+                        if (message.Contains("\"req\"")) //done for faster pre-check
+                        {
+                            Hashtable map = (Hashtable)JsonSerializer.DeserializeString(message);
+                            if (map.ContainsKey("req"))
+                            {
+                                if (int.TryParse(map["req"].ToString(), out var reqId))
+                                {
+                                    if (WaitingRequests.TryRemove(reqId, out var tcs))
+                                    {
+                                        if (!(tcs.Task.IsCompleted || tcs.Task.IsCanceled))
+                                        {
+                                            tcs.TrySetResult(e.Message);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception) { }
+                }
+
                 // Did we receive a keygen response?
                 if (e.Topic == "emitter/keygen/")
                 {
@@ -269,7 +303,7 @@ namespace Emitter
                 if (e.Topic == "emitter/error/")
                 {
                     var errorEvent = ErrorEvent.FromBinary(e.Message);
-                    var emitterException = new EmitterException((EmitterEventCode) errorEvent.Status, errorEvent.Message);
+                    var emitterException = new EmitterException((EmitterEventCode)errorEvent.Status, errorEvent.Message);
 
                     InvokeError(emitterException);
                 }
@@ -364,6 +398,59 @@ namespace Emitter
                 }
             }
         }
+
+#if (FX40 != true)
+        private async Task<byte[]> ExecuteAsync(TimeSpan timeout, string requestName, byte[] payload, CancellationToken cancellationToken)
+        {
+            if (requestName == null) throw new ArgumentNullException(nameof(requestName));
+            int messageId = 0;
+            try
+            {
+                RequestNames[requestName] = RequestNames.ContainsKey(requestName) ? RequestNames[requestName] + 1 : 1;
+
+                var tcs = new TaskCompletionSource<byte[]>();
+                messageId = this.Client.Publish(requestName, payload, MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE, false);
+                if (!WaitingRequests.TryAdd(messageId, tcs))
+                {
+                    throw new InvalidOperationException();
+                }
+
+                using (var timeoutCts = new CancellationTokenSource(timeout))
+                using (var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeoutCts.Token))
+                {
+                    linkedCts.Token.Register(() =>
+                    {
+                        if (!tcs.Task.IsCompleted && !tcs.Task.IsFaulted && !tcs.Task.IsCanceled)
+                        {
+                            tcs.TrySetCanceled();
+                        }
+                    });
+
+                    try
+                    {
+                        var result = await tcs.Task.ConfigureAwait(false);
+                        timeoutCts.Cancel(false);
+                        return result;
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        if (timeoutCts.IsCancellationRequested && !cancellationToken.IsCancellationRequested)
+                        {
+                            throw new MqttTimeoutException();
+                        }
+                        else
+                        {
+                            throw;
+                        }
+                    }
+                }
+            }
+            finally
+            {
+                WaitingRequests.TryRemove(messageId, out _);
+            }
+        }
+#endif
 
         #endregion Private Members
 

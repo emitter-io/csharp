@@ -51,6 +51,16 @@ namespace Emitter.Sample
                     Options.WithUntil(DateTime.UtcNow),
                     Options.WithLast(10_000));
 
+                try
+                {
+                    var key = emitter.KeyGen(channelKey, channel, SecurityAccess.Read, 0, TimeSpan.FromMilliseconds(100)).GetAwaiter().GetResult();
+                }
+                catch (MqttTimeoutException)
+                {
+                    Console.WriteLine("Timeout exception in KeyGen...");
+                    //Timeout exception
+                }
+
                 emitter.Link(channelKey, channel, "L0", false, true);
                 emitter.Link(channelKey, channel, "L1", false, true);
                 emitter.PublishWithLink("L0", "Link test");
