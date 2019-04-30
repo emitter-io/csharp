@@ -54,7 +54,7 @@ namespace Emitter
         private readonly ReverseTrie<MessageHandler> Trie = new ReverseTrie<MessageHandler>(-1);
         private string DefaultKey = null;
 
-        private readonly ConcurrentDictionary<int, TaskCompletionSource<byte[]>> WaitingRequests = new ConcurrentDictionary<int, TaskCompletionSource<byte[]>>();
+        private readonly ConcurrentDictionary<long, TaskCompletionSource<byte[]>> WaitingRequests = new ConcurrentDictionary<long, TaskCompletionSource<byte[]>>();
         private readonly ConcurrentDictionary<string, int> RequestNames = new ConcurrentDictionary<string, int>();
         private readonly TimeSpan DefaultTimeout = TimeSpan.FromSeconds(5);
 
@@ -252,29 +252,22 @@ namespace Emitter
                 //Did we receive a response to ExecuteAsync request?
                 if (RequestNames.ContainsKey(e.Topic))
                 {
-                    try
+                    var message = new string(Encoding.UTF8.GetChars(e.Message));
+                    var response = KeygenResponse.FromBinary(e.Message);
+                    if (response.RequestId != null)
                     {
-                        var message = new string(Encoding.UTF8.GetChars(e.Message));
-                        if (message.Contains("\"req\"")) //done for faster pre-check
+                        if (WaitingRequests.TryRemove(response.RequestId.Value, out var tcs))
                         {
-                            Hashtable map = (Hashtable)JsonSerializer.DeserializeString(message);
-                            if (map.ContainsKey("req"))
+                            if (!(tcs.Task.IsCompleted || tcs.Task.IsCanceled))
                             {
-                                if (int.TryParse(map["req"].ToString(), out var reqId))
-                                {
-                                    if (WaitingRequests.TryRemove(reqId, out var tcs))
-                                    {
-                                        if (!(tcs.Task.IsCompleted || tcs.Task.IsCanceled))
-                                        {
-                                            tcs.TrySetResult(e.Message);
-                                        }
-                                    }
-                                }
+                                tcs.TrySetResult(e.Message);
                             }
+                            // We were able to retrieve a task for this request. Now return.
+                            // If we were not able to retrieve a task, this could be that the user also sent a
+                            // keygen request using the regular non async function, so it should be handled below.
+                            return;
                         }
-                    }
-                    catch (Exception) { }
-                    return;
+                    }                    
                 }
 
                 // Did we receive a keygen response?
