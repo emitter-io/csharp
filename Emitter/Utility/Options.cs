@@ -20,7 +20,9 @@ namespace Emitter.Utility
 
         private static long ToTimestamp(DateTime d)
         {
-            return (long)d.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds;
+            if (d.Kind == DateTimeKind.Utc)
+                return (long)d.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds;
+            return (long)d.ToUniversalTime().Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds;
         }
 
         public static string WithFrom(DateTime from) { return "from=" + ToTimestamp(from); }
