@@ -1,0 +1,219 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{55B7935D-6F8D-44E2-AE89-97401869BA27}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Emitter.Net462</RootNamespace>
+    <AssemblyName>Emitter.Net462</AssemblyName>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\bin\Debug\Emitter.Net462\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;SSL,FX</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\bin\Release\Emitter.Net462\</OutputPath>
+    <DefineConstants>TRACE;SSL,FX</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\Emitter\Emitter.cs">
+      <Link>Emitter.cs</Link>
+    </Compile>
+    <Compile Include="..\Emitter\Emitter.KeyGen.cs">
+      <Link>Emitter.KeyGen.cs</Link>
+    </Compile>
+    <Compile Include="..\Emitter\Emitter.Link.cs">
+      <Link>Emitter.Link.cs</Link>
+    </Compile>
+    <Compile Include="..\Emitter\Emitter.Me.cs">
+      <Link>Emitter.Me.cs</Link>
+    </Compile>
+    <Compile Include="..\Emitter\Emitter.Presence.cs">
+      <Link>Emitter.Presence.cs</Link>
+    </Compile>
+    <Compile Include="..\Emitter\Emitter.Publish.cs">
+      <Link>Emitter.Publish.cs</Link>
+    </Compile>
+    <Compile Include="..\Emitter\Emitter.Subscribe.cs">
+      <Link>Emitter.Subscribe.cs</Link>
+    </Compile>
+    <Compile Include="..\Emitter\Exceptions\EmitterException.cs">
+      <Link>EmitterException.cs</Link>
+    </Compile>
+    <Compile Include="..\Emitter\Exceptions\MqttClientException.cs">
+      <Link>MqttClientException.cs</Link>
+    </Compile>
+    <Compile Include="..\Emitter\Exceptions\MqttConnectionException.cs">
+      <Link>MqttConnectionException.cs</Link>
+    </Compile>
+    <Compile Include="..\Emitter\Exceptions\MqttTimeoutException.cs">
+      <Link>MqttTimeoutException.cs</Link>
+    </Compile>
+    <Compile Include="..\Emitter\IMqttNetworkChannel.cs">
+      <Link>IMqttNetworkChannel.cs</Link>
+    </Compile>
+    <Compile Include="..\Emitter\Internal\InternalEvent.cs">
+      <Link>InternalEvent.cs</Link>
+    </Compile>
+    <Compile Include="..\Emitter\Internal\MsgInternalEvent.cs">
+      <Link>MsgInternalEvent.cs</Link>
+    </Compile>
+    <Compile Include="..\Emitter\Internal\MsgPublishedInternalEvent.cs">
+      <Link>MsgPublishedInternalEvent.cs</Link>
+    </Compile>
+    <Compile Include="..\Emitter\Json\JsonParser.cs">
+      <Link>JsonParser.cs</Link>
+    </Compile>
+    <Compile Include="..\Emitter\Json\JsonSerializer.cs">
+      <Link>JsonSerializer.cs</Link>
+    </Compile>
+    <Compile Include="..\Emitter\Messages\ErrorEvent.cs">
+      <Link>ErrorEvent.cs</Link>
+    </Compile>
+    <Compile Include="..\Emitter\Messages\KeygenRequest.cs">
+      <Link>KeygenRequest.cs</Link>
+    </Compile>
+    <Compile Include="..\Emitter\Messages\KeygenResponse.cs">
+      <Link>KeygenResponse.cs</Link>
+    </Compile>
+    <Compile Include="..\Emitter\Messages\LinkRequest.cs">
+      <Link>LinkRequest.cs</Link>
+    </Compile>
+    <Compile Include="..\Emitter\Messages\MeResponse.cs">
+      <Link>MeResponse.cs</Link>
+    </Compile>
+    <Compile Include="..\Emitter\Messages\MqttMsgBase.cs">
+      <Link>MqttMsgBase.cs</Link>
+    </Compile>
+    <Compile Include="..\Emitter\Messages\MqttMsgConnack.cs">
+      <Link>MqttMsgConnack.cs</Link>
+    </Compile>
+    <Compile Include="..\Emitter\Messages\MqttMsgConnect.cs">
+      <Link>MqttMsgConnect.cs</Link>
+    </Compile>
+    <Compile Include="..\Emitter\Messages\MqttMsgConnectEventArgs.cs">
+      <Link>MqttMsgConnectEventArgs.cs</Link>
+    </Compile>
+    <Compile Include="..\Emitter\Messages\MqttMsgContext.cs">
+      <Link>MqttMsgContext.cs</Link>
+    </Compile>
+    <Compile Include="..\Emitter\Messages\MqttMsgDisconnect.cs">
+      <Link>MqttMsgDisconnect.cs</Link>
+    </Compile>
+    <Compile Include="..\Emitter\Messages\MqttMsgPingReq.cs">
+      <Link>MqttMsgPingReq.cs</Link>
+    </Compile>
+    <Compile Include="..\Emitter\Messages\MqttMsgPingResp.cs">
+      <Link>MqttMsgPingResp.cs</Link>
+    </Compile>
+    <Compile Include="..\Emitter\Messages\MqttMsgPuback.cs">
+      <Link>MqttMsgPuback.cs</Link>
+    </Compile>
+    <Compile Include="..\Emitter\Messages\MqttMsgPubcomp.cs">
+      <Link>MqttMsgPubcomp.cs</Link>
+    </Compile>
+    <Compile Include="..\Emitter\Messages\MqttMsgPublish.cs">
+      <Link>MqttMsgPublish.cs</Link>
+    </Compile>
+    <Compile Include="..\Emitter\Messages\MqttMsgPublishedEventArgs.cs">
+      <Link>MqttMsgPublishedEventArgs.cs</Link>
+    </Compile>
+    <Compile Include="..\Emitter\Messages\MqttMsgPublishEventArgs.cs">
+      <Link>MqttMsgPublishEventArgs.cs</Link>
+    </Compile>
+    <Compile Include="..\Emitter\Messages\MqttMsgPubrec.cs">
+      <Link>MqttMsgPubrec.cs</Link>
+    </Compile>
+    <Compile Include="..\Emitter\Messages\MqttMsgPubrel.cs">
+      <Link>MqttMsgPubrel.cs</Link>
+    </Compile>
+    <Compile Include="..\Emitter\Messages\MqttMsgSuback.cs">
+      <Link>MqttMsgSuback.cs</Link>
+    </Compile>
+    <Compile Include="..\Emitter\Messages\MqttMsgSubscribe.cs">
+      <Link>MqttMsgSubscribe.cs</Link>
+    </Compile>
+    <Compile Include="..\Emitter\Messages\MqttMsgSubscribedEventArgs.cs">
+      <Link>MqttMsgSubscribedEventArgs.cs</Link>
+    </Compile>
+    <Compile Include="..\Emitter\Messages\MqttMsgSubscribeEventArgs.cs">
+      <Link>MqttMsgSubscribeEventArgs.cs</Link>
+    </Compile>
+    <Compile Include="..\Emitter\Messages\MqttMsgUnsuback.cs">
+      <Link>MqttMsgUnsuback.cs</Link>
+    </Compile>
+    <Compile Include="..\Emitter\Messages\MqttMsgUnsubscribe.cs">
+      <Link>MqttMsgUnsubscribe.cs</Link>
+    </Compile>
+    <Compile Include="..\Emitter\Messages\MqttMsgUnsubscribedEventArgs.cs">
+      <Link>MqttMsgUnsubscribedEventArgs.cs</Link>
+    </Compile>
+    <Compile Include="..\Emitter\Messages\MqttMsgUnsubscribeEventArgs.cs">
+      <Link>MqttMsgUnsubscribeEventArgs.cs</Link>
+    </Compile>
+    <Compile Include="..\Emitter\Messages\PresenceEvent.cs">
+      <Link>PresenceEvent.cs</Link>
+    </Compile>
+    <Compile Include="..\Emitter\Messages\PresenceRequest.cs">
+      <Link>PresenceRequest.cs</Link>
+    </Compile>
+    <Compile Include="..\Emitter\MqttClient.cs">
+      <Link>MqttClient.cs</Link>
+    </Compile>
+    <Compile Include="..\Emitter\MqttSecurity.cs">
+      <Link>MqttSecurity.cs</Link>
+    </Compile>
+    <Compile Include="..\Emitter\MqttSettings.cs">
+      <Link>MqttSettings.cs</Link>
+    </Compile>
+    <Compile Include="..\Emitter\Net\Fx.cs">
+      <Link>Fx.cs</Link>
+    </Compile>
+    <Compile Include="..\Emitter\Net\MqttNetworkChannel.cs">
+      <Link>MqttNetworkChannel.cs</Link>
+    </Compile>
+    <Compile Include="..\Emitter\Properties\AssemblyInfo.cs">
+      <Link>AssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\Emitter\Session\MqttClientSession.cs">
+      <Link>MqttClientSession.cs</Link>
+    </Compile>
+    <Compile Include="..\Emitter\Session\MqttSession.cs">
+      <Link>MqttSession.cs</Link>
+    </Compile>
+    <Compile Include="..\Emitter\Utility\Extensions.cs">
+      <Link>Extensions.cs</Link>
+    </Compile>
+    <Compile Include="..\Emitter\Utility\Options.cs">
+      <Link>Options.cs</Link>
+    </Compile>
+    <Compile Include="..\Emitter\Utility\ReverseTrie.cs">
+      <Link>ReverseTrie.cs</Link>
+    </Compile>
+    <Compile Include="..\Emitter\Utility\Trace.cs">
+      <Link>Trace.cs</Link>
+    </Compile>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
