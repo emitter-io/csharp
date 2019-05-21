@@ -31,6 +31,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Emitter.Net47", "Emitter.Pr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Emitter.Net471", "Emitter.Projects\Emitter.Net471.csproj", "{99327CFB-8D72-409C-A1AA-F6937D443A00}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Emitter.Net472", "Emitter.Projects\Emitter.Net472.csproj", "{07577490-A48D-46CD-AAF5-8F7A90B12E2B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -93,6 +95,10 @@ Global
 		{99327CFB-8D72-409C-A1AA-F6937D443A00}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{99327CFB-8D72-409C-A1AA-F6937D443A00}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{99327CFB-8D72-409C-A1AA-F6937D443A00}.Release|Any CPU.Build.0 = Release|Any CPU
+		{07577490-A48D-46CD-AAF5-8F7A90B12E2B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{07577490-A48D-46CD-AAF5-8F7A90B12E2B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{07577490-A48D-46CD-AAF5-8F7A90B12E2B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{07577490-A48D-46CD-AAF5-8F7A90B12E2B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

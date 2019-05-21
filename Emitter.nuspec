@@ -31,6 +31,8 @@
     <file src="bin\Release\Emitter.Net461\*.*" target="lib\net461" />
 	<file src="bin\Release\Emitter.Net462\*.*" target="lib\net462" />
 	<file src="bin\Release\Emitter.Net47\*.*" target="lib\net47" />
+	<file src="bin\Release\Emitter.Net471\*.*" target="lib\net471" />
+	<file src="bin\Release\Emitter.Net472\*.*" target="lib\net472" />
 
     <file src="bin\Release\Emitter.WinRT\*.*" target="lib\win81" />
     <file src="bin\Release\Emitter.WinRT\*.*" target="lib\wpa81" />
