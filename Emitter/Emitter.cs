@@ -249,27 +249,6 @@ namespace Emitter
                     return;
                 }
 
-                //Did we receive a response to ExecuteAsync request?
-                if (RequestNames.ContainsKey(e.Topic))
-                {
-                    var message = new string(Encoding.UTF8.GetChars(e.Message));
-                    var response = KeygenResponse.FromBinary(e.Message);
-                    if (response.RequestId != null)
-                    {
-                        if (WaitingRequests.TryRemove(response.RequestId.Value, out var tcs))
-                        {
-                            if (!(tcs.Task.IsCompleted || tcs.Task.IsCanceled))
-                            {
-                                tcs.TrySetResult(e.Message);
-                            }
-                            // We were able to retrieve a task for this request. Now return.
-                            // If we were not able to retrieve a task, this could be that the user also sent a
-                            // keygen request using the regular non async function, so it should be handled below.
-                            return;
-                        }
-                    }                    
-                }
-
                 // Did we receive a keygen response?
                 if (e.Topic == "emitter/keygen/")
                 {
@@ -399,60 +378,6 @@ namespace Emitter
                 }
             }
         }
-
-#if (FX40 != true)
-        private async Task<byte[]> ExecuteAsync(TimeSpan timeout, string requestName, byte[] payload, CancellationToken cancellationToken)
-        {
-            if (requestName == null) throw new ArgumentNullException(nameof(requestName));
-            int messageId = 0;
-            try
-            {
-                RequestNames[requestName] = RequestNames.ContainsKey(requestName) ? RequestNames[requestName] + 1 : 1;
-
-                var tcs = new TaskCompletionSource<byte[]>();
-                messageId = this.Client.Publish(requestName, payload, MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE, false);
-                if (!WaitingRequests.TryAdd(messageId, tcs))
-                {
-                    throw new InvalidOperationException();
-                }
-
-                using (var timeoutCts = new CancellationTokenSource(timeout))
-                using (var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeoutCts.Token))
-                {
-                    linkedCts.Token.Register(() =>
-                    {
-                        if (!tcs.Task.IsCompleted && !tcs.Task.IsFaulted && !tcs.Task.IsCanceled)
-                        {
-                            tcs.TrySetCanceled();
-                        }
-                    });
-
-                    try
-                    {
-                        var result = await tcs.Task.ConfigureAwait(false);
-                        timeoutCts.Cancel(false);
-                        return result;
-                    }
-                    catch (OperationCanceledException)
-                    {
-                        if (timeoutCts.IsCancellationRequested && !cancellationToken.IsCancellationRequested)
-                        {
-                            throw new MqttTimeoutException();
-                        }
-                        else
-                        {
-                            throw;
-                        }
-                    }
-                }
-            }
-            finally
-            {
-                WaitingRequests.TryRemove(messageId, out _);
-            }
-        }
-#endif
-
 #endregion Private Members
 
 #region IDisposable
