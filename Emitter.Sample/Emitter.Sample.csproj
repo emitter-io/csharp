@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Emitter.Sample</RootNamespace>
     <AssemblyName>Emitter.Sample</AssemblyName>
-    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <TargetFrameworkProfile />
@@ -44,9 +44,9 @@
     <None Include="app.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Emitter.Projects\Emitter.Net47.csproj">
-      <Project>{7d1ff1bf-6af6-4cda-8259-7b56386be445}</Project>
-      <Name>Emitter.Net47</Name>
+    <ProjectReference Include="..\Emitter.Projects\Emitter.Net471.csproj">
+      <Project>{99327cfb-8d72-409c-a1aa-f6937d443a00}</Project>
+      <Name>Emitter.Net471</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
