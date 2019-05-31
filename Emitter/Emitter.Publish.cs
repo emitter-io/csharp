@@ -79,7 +79,7 @@ namespace Emitter
         /// <param name="key">The key to use for this publish request.</param>
         /// <param name="channel">The channel to publish to.</param>
         /// <param name="message">The message body to send.</param>
-        /// <param name="options">The options associated with the message, such as 'ttl' or 'last'. Ex: Options.WithLast(5).</param>
+        /// <param name="options">The options associated with the message. Ex: Options.WithLast(5).</param>
         /// <returns>The message identifier.</returns>
         public ushort Publish(string key, string channel, string message, params string[] options)
         {
@@ -107,7 +107,7 @@ namespace Emitter
         /// <param name="key">The key to use for this publish request.</param>
         /// <param name="channel">The channel to publish to.</param>
         /// <param name="message">The message body to send.</param>
-        /// <param name="options">The options associated with the message, such as 'ttl' or 'last'. Ex: Options.WithLast(5).</param>
+        /// <param name="options">The options associated with the message. Ex: Options.WithoutEcho().</param>
         /// <returns>The message identifier.</returns>
         public ushort Publish(string key, string channel, byte[] message, params string[] options)
         {

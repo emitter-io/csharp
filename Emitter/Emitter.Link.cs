@@ -7,6 +7,14 @@ namespace Emitter
 {
     public partial class Connection
     {
+        /// <summary>
+        /// Create a short 2-character link for the channel. Uses the default key that should be specified in the constructor.
+        /// </summary>
+        /// <param name="channel">The channel to link to.</param>
+        /// <param name="name">The name of the link to create.</param>
+        /// <param name="isPrivate">Whether the link is private.</param>
+        /// <param name="subscribe"></param>
+        /// <param name="options"></param>
         public void Link(string channel, string name, bool isPrivate, bool subscribe, params string[] options)
         {
             if (this.DefaultKey == null)

@@ -15,6 +15,9 @@ namespace Emitter
 
         public event MeHandler Me;
 
+        /// <summary>
+        /// Requests information on the current connection.
+        /// </summary>
         public void MeInfo()
         {
             this.Publish("emitter/", "me", new byte[]{});
