@@ -49,6 +49,9 @@ namespace Emitter.Messages
         public static KeygenResponse FromJson(string json)
         {
             var map = JsonSerializer.DeserializeString(json) as Hashtable;
+            // Check for error.
+            ErrorEvent.ThrowIfError(map);
+
             var response = new KeygenResponse();
 
             if (map.ContainsKey("req")) response.RequestId = (long)map["req"];

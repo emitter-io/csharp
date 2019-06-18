@@ -27,5 +27,13 @@ namespace Emitter.Messages
         {
             return FromJson(new string(Encoding.UTF8.GetChars(message)));
         }
+
+        public static void ThrowIfError(Hashtable map)
+        {
+            if (map.ContainsKey("status") && (long)map["status"] != 200)
+            {
+                throw new EmitterException((EmitterEventCode)map["status"], (string)map["message"]);
+            }
+        }
     }
 }

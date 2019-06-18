@@ -23,7 +23,7 @@ namespace Emitter
     /// <summary>
     /// Represents a set of event codes used for emitter.
     /// </summary>
-    public enum EmitterEventCode
+    public enum EmitterEventCode : long
     {
         Message = 100,
         Success = 200,

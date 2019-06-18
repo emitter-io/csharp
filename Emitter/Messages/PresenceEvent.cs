@@ -25,6 +25,10 @@ namespace Emitter.Messages
         public static PresenceEvent FromJson(string json)
         {
             var map = JsonSerializer.DeserializeString(json) as Hashtable;
+
+            // Check for error.
+            ErrorEvent.ThrowIfError(map);
+
             var response = new Emitter.Messages.PresenceEvent();
 
             if (map.ContainsKey("req")) response.RequestId = (long)map["req"];
