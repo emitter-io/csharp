@@ -108,7 +108,7 @@ namespace Emitter
 
 #endregion Constructors
 
-#region Error Members
+        #region Error Members
 
         /// <summary>
         /// Occurs when an error occurs.
@@ -136,9 +136,9 @@ namespace Emitter
             InvokeError(EmitterException.FromStatus(status));
         }
 
-#endregion Error Members
+        #endregion Error Members
 
-#region Static Members
+        #region Static Members
 
         /// <summary>
         /// Establishes a new connection by creating the connection instance and connecting to it.
@@ -228,8 +228,16 @@ namespace Emitter
 
 #endregion Connect / Disconnect Members
 
-        //public event PresenceHandler Presence;
+        private void InvokeTrieHandlers<T>(ReverseTrie<T> trie, T defaultHandler, MqttMsgPublishEventArgs e) where T : class
+        {
+            var handlers = this.Trie.Match(e.Topic);
+            // Invoke every handler matching the channel
+            foreach (MessageHandler handler in handlers)
+                handler(e.Topic, e.Message);
 
+            if (handlers.Count == 0)
+                DefaultMessageHandler?.Invoke(e.Topic, e.Message);
+        }
 
         /// <summary>
         /// Occurs when a message is received.
@@ -242,10 +250,7 @@ namespace Emitter
             {
                 if (!e.Topic.StartsWith("emitter"))
                 {
-                    // Invoke every handler matching the channel
-                    foreach (MessageHandler handler in this.Trie.Match(e.Topic))
-                        handler(e.Topic, e.Message);
-
+                    InvokeTrieHandlers<MessageHandler>(Trie, DefaultMessageHandler, e);
                     return;
                 }
 
@@ -271,9 +276,7 @@ namespace Emitter
                 {
                     var presenceEvent = PresenceEvent.FromBinary(e.Message);
                     // Invoke every handler matching the channel
-                    foreach (PresenceHandler handler in this.PresenceTrie.Match(presenceEvent.Channel))
-                        handler(presenceEvent);
-
+                    InvokeTrieHandlers<PresenceHandler>(PresenceTrie, DefaultPresenceHandler, e);
                     return;
                 }
 
