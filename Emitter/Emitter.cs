@@ -228,17 +228,6 @@ namespace Emitter
 
 #endregion Connect / Disconnect Members
 
-        private void InvokeTrieHandlers<T>(ReverseTrie<T> trie, T defaultHandler, MqttMsgPublishEventArgs e) where T : class
-        {
-            var handlers = this.Trie.Match(e.Topic);
-            // Invoke every handler matching the channel
-            foreach (MessageHandler handler in handlers)
-                handler(e.Topic, e.Message);
-
-            if (handlers.Count == 0)
-                DefaultMessageHandler?.Invoke(e.Topic, e.Message);
-        }
-
         /// <summary>
         /// Occurs when a message is received.
         /// </summary>
@@ -250,7 +239,13 @@ namespace Emitter
             {
                 if (!e.Topic.StartsWith("emitter"))
                 {
-                    InvokeTrieHandlers<MessageHandler>(Trie, DefaultMessageHandler, e);
+                    var handlers = this.Trie.Match(e.Topic);
+                    // Invoke every handler matching the channel
+                    foreach (MessageHandler handler in handlers)
+                        handler(e.Topic, e.Message);
+
+                    if (handlers.Count == 0)
+                        DefaultMessageHandler?.Invoke(e.Topic, e.Message);
                     return;
                 }
 
@@ -275,8 +270,15 @@ namespace Emitter
                 if (e.Topic == "emitter/presence/")
                 {
                     var presenceEvent = PresenceEvent.FromBinary(e.Message);
+                    
+                    var handlers = this.PresenceTrie.Match(presenceEvent.Channel);
                     // Invoke every handler matching the channel
-                    InvokeTrieHandlers<PresenceHandler>(PresenceTrie, DefaultPresenceHandler, e);
+                    foreach (PresenceHandler handler in handlers)
+                        handler(presenceEvent);
+
+                    if (handlers.Count == 0)
+                        DefaultPresenceHandler?.Invoke(presenceEvent);
+
                     return;
                 }
 

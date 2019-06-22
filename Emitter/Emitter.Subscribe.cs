@@ -19,7 +19,7 @@ namespace Emitter
         /// <param name="optionalHandler">The callback to be invoked every time the message is received.</param>
         /// <param name="options">The options of the channel. Ex: Options.WithLast(10)</param>;
         /// <returns>The message identifier for this operation.</returns>
-        public ushort Subscribe(string channel, MessageHandler optionalHandler, params string[] options)
+        public ushort Subscribe(string channel, MessageHandler optionalHandler=null, params string[] options)
         {
             if (this.DefaultKey == null)
                 throw EmitterException.NoDefaultKey;
@@ -34,7 +34,7 @@ namespace Emitter
         /// <param name="optionalHandler">The callback to be invoked every time the message is received.</param>
         /// <param name="options">The options of the channel. Ex: Options.WithLast(10)</param>;
         /// <returns>The message identifier for this operation.</returns>
-        public ushort Subscribe(string key, string channel, MessageHandler optionalHandler, params string[] options)
+        public ushort Subscribe(string key, string channel, MessageHandler optionalHandler=null, params string[] options)
         {
             // Register the handler
             if (optionalHandler != null)
@@ -53,7 +53,7 @@ namespace Emitter
         /// <param name="optionalHandler">The callback to be invoked every time the message is received.</param>
         /// <param name="options">The options of the channel. Ex: Options.WithLast(10)</param>;
         /// <returns>The message identifier for this operation.</returns>
-        public ushort SubscribeWithGroup(string key, string channel, string shareGroup, MessageHandler optionalHandler, params string[] options)
+        public ushort SubscribeWithGroup(string key, string channel, string shareGroup, MessageHandler optionalHandler=null, params string[] options)
         {
             // Register the handler
             if (optionalHandler != null)

@@ -26,7 +26,7 @@ namespace Emitter
         /// <param name="channel">The name of the channel</param>
         /// <param name="status">Whether to request a status of the channel.</param>
         /// <param name="optionalHandler">A specific handler to receive presence events for this channel.</param>
-        public void PresenceSubscribe(string channel, bool status, PresenceHandler optionalHandler)
+        public void PresenceSubscribe(string channel, bool status, PresenceHandler optionalHandler=null)
         {
             if (this.DefaultKey == null)
                 throw EmitterException.NoDefaultKey;
@@ -41,7 +41,7 @@ namespace Emitter
         /// <param name="channel">The name of the channel</param>
         /// <param name="status">Whether to request a status of the channel.</param>
         /// <param name="optionalHandler">A specific handler to receive presence events for this channel.</param>
-        public void PresenceSubscribe(string key, string channel, bool status, PresenceHandler optionalHandler)
+        public void PresenceSubscribe(string key, string channel, bool status, PresenceHandler optionalHandler=null)
         {
             if (optionalHandler != null)
                 this.PresenceTrie.RegisterHandler(channel, optionalHandler);
