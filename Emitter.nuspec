@@ -11,7 +11,7 @@
     <iconUrl>https://raw.githubusercontent.com/emitter-io/csharp/master/Emitter.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Emitter is an MQTT client tailored for emitter.io service, allowing real-time publish subscribe. It supports full .Net Framework and WinRT platform (Windows 8+ and Windows Phone 8+).</description>
-    <summary>Emitter is an MQTT client tailored for emitter.io service, allowing real-time publish subscribe. It supports full .Net Framework, .Net Micro Framework and WinRT platform (Windows 8+ and Windows Phone 8+).</summary>
+    <summary>Emitter is an MQTT client tailored for emitter.io service, allowing real-time publish subscribe. It supports full .Net Framework and WinRT platform (Windows 8+ and Windows Phone 8+).</summary>
     <copyright>Misakai Ltd.</copyright>
     <tags>emitter mqtt queue messaging pubsub publish subscribe internetofthings iot cloud embedded netduino hardware winrt windows8 windows8.1 windowsphone windowsphone8.1 gadgeteer</tags>
     <dependencies>
@@ -29,6 +29,10 @@
     <file src="bin\Release\Emitter.Net452\*.*" target="lib\net452" />
     <file src="bin\Release\Emitter.Net46\*.*" target="lib\net46" />
     <file src="bin\Release\Emitter.Net461\*.*" target="lib\net461" />
+	<file src="bin\Release\Emitter.Net462\*.*" target="lib\net462" />
+	<file src="bin\Release\Emitter.Net47\*.*" target="lib\net47" />
+	<file src="bin\Release\Emitter.Net471\*.*" target="lib\net471" />
+	<file src="bin\Release\Emitter.Net472\*.*" target="lib\net472" />
 
     <file src="bin\Release\Emitter.WinRT\*.*" target="lib\win81" />
     <file src="bin\Release\Emitter.WinRT\*.*" target="lib\wpa81" />

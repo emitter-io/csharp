@@ -24,6 +24,8 @@ namespace Emitter.Messages
     /// </summary>
     public class KeygenResponse
     {
+        public long? RequestId;
+
         /// <summary>
         /// Gets or sets the generated key.
         /// </summary>
@@ -47,11 +49,15 @@ namespace Emitter.Messages
         public static KeygenResponse FromJson(string json)
         {
             var map = JsonSerializer.DeserializeString(json) as Hashtable;
+            // Check for error.
+            ErrorEvent.ThrowIfError(map);
+
             var response = new KeygenResponse();
 
-            response.Key = (string)map["key"];
-            response.Channel = (string)map["channel"];
-            response.Status = Convert.ToInt32(map["status"].ToString());
+            if (map.ContainsKey("req")) response.RequestId = (long)map["req"];
+            if (map.ContainsKey("key")) response.Key = (string)map["key"];
+            if (map.ContainsKey("channel")) response.Channel = (string)map["channel"];
+            if (map.ContainsKey("status")) response.Status = Convert.ToInt32(map["status"].ToString());
             
             return response;
         }

@@ -14,9 +14,12 @@ Contributors:
 
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Text;
-
+using System.Threading;
+using System.Threading.Tasks;
 using Emitter.Messages;
+using Emitter.Utility;
 
 #if (MF_FRAMEWORK_VERSION_V4_2 || MF_FRAMEWORK_VERSION_V4_3)
 
@@ -32,7 +35,7 @@ namespace Emitter
     public delegate void MessageHandler(string channel, byte[] message);
 
     /// <summary>
-    /// Delegate that defines event handler for cliet/peer disconnection
+    /// Delegate that defines event handler for client/peer disconnection
     /// </summary>
     public delegate void DisconnectHandler(object sender, EventArgs e);
 
@@ -44,44 +47,66 @@ namespace Emitter
     /// <summary>
     /// Represents emitter.io MQTT-based client.
     /// </summary>
-    public class Connection : IDisposable
+    public partial class Connection : IDisposable
     {
         #region Constructors
         private readonly MqttClient Client;
-        private readonly ReverseTrie Trie = new ReverseTrie(-1);
+        private readonly ReverseTrie<MessageHandler> Trie = new ReverseTrie<MessageHandler>(-1);
         private string DefaultKey = null;
 
+        private readonly ConcurrentDictionary<long, TaskCompletionSource<byte[]>> WaitingRequests = new ConcurrentDictionary<long, TaskCompletionSource<byte[]>>();
+        private readonly ConcurrentDictionary<string, int> RequestNames = new ConcurrentDictionary<string, int>();
+        private readonly TimeSpan DefaultTimeout = TimeSpan.FromSeconds(5);
+
+
         /// <summary>
         /// Constructs a new emitter.io connection.
         /// </summary>
-        public Connection() : this(null, 0, null) { }
+        public Connection() : this(null, null, 0, true) { }
 
         /// <summary>
         /// Constructs a new emitter.io connection.
         /// </summary>
         /// <param name="defaultKey">The default key to use.</param>
-        public Connection(string defaultKey) : this(null, 0, defaultKey) { }
+        public Connection(string defaultKey) : this(defaultKey, null, 0, true) { }
 
         /// <summary>
         /// Constructs a new emitter.io connection.
         /// </summary>
-        /// <param name="broker">The broker hostname to use.</param>
         /// <param name="defaultKey">The default key to use.</param>
-        /// <param name="useTls">Whether we should use TLS security.</param>
-        public Connection(string broker, int brokerPort, string defaultKey)
+        /// <param name="broker">The address of the broker.</param>
+        /// <param name="secure">Whether the connection has to be secure.</param>
+        public Connection(string defaultKey, string broker, bool secure = true) : this(defaultKey, broker, 0, secure) { }
+
+        /// <summary>
+        /// Constructs a new emitter.io connection.
+        /// </summary>
+        /// <param name="defaultKey">The default key to use.</param>
+        /// <param name="broker">The address of the broker.</param>
+        /// <param name="brokerPort">The port of the broker to use.</param>
+        /// <param name="secure">Whether the connection has to be secure.</param>
+        public Connection(string defaultKey, string broker, int brokerPort, bool secure = true)
         {
             if (broker == null)
                 broker = "api.emitter.io";
             if (brokerPort <= 0)
-                brokerPort = MqttSettings.MQTT_BROKER_DEFAULT_PORT;
+                brokerPort = secure ? 443 : 8080;
 
             this.DefaultKey = defaultKey;
-            this.Client = new MqttClient(broker, brokerPort);
+            if (secure)
+                #if !(WINDOWS_APP || WINDOWS_PHONE_APP)
+                this.Client = new MqttClient(broker, brokerPort, true, MqttSslProtocols.TLSv1_0, null, null);
+                #else
+                this.Client = new MqttClient(broker, brokerPort, true, MqttSslProtocols.TLSv1_0);
+                #endif
+            else
+                this.Client = new MqttClient(broker, brokerPort);
+
             this.Client.MqttMsgPublishReceived += OnMessageReceived;
             this.Client.ConnectionClosed += OnDisconnect;
         }
 
-        #endregion Constructors
+#endregion Constructors
 
         #region Error Members
 
@@ -96,8 +121,7 @@ namespace Emitter
         /// <param name="ex"></param>
         private void InvokeError(Exception ex)
         {
-            if (this.Error != null)
-                this.Error(this, ex);
+            this.Error?.Invoke(this, ex);
         }
 
         /// <summary>
@@ -117,17 +141,12 @@ namespace Emitter
         #region Static Members
 
         /// <summary>
-        /// Gets the default instance of the client.
-        /// </summary>
-        public static readonly Connection Default = new Connection();
-
-        /// <summary>
         /// Establishes a new connection by creating the connection instance and connecting to it.
         /// </summary>
         /// <returns>The connection state.</returns>
         public static Connection Establish()
         {
-            return Establish(null, 0, null);
+            return Establish(null, null, 0, true);
         }
 
         /// <summary>
@@ -137,7 +156,12 @@ namespace Emitter
         /// <returns>The connection state.</returns>
         public static Connection Establish(string defaultKey)
         {
-            return Establish(null, 0, defaultKey);
+            return Establish(defaultKey, null, 0, true);
+        }
+
+        public static Connection Establish(string defaultKey, string broker, bool secure = true)
+        {
+            return Establish(defaultKey, broker, 0, secure);
         }
 
         /// <summary>
@@ -145,12 +169,11 @@ namespace Emitter
         /// </summary>
         /// <param name="brokerHostName">The broker hostname to use.</param>
         /// <param name="defaultKey">The default key to use.</param>
-        /// <param name="useTls">Whether we should use TLS security.</param>
         /// <returns>The connection state.</returns>
-        public static Connection Establish(string brokerHostName, int brokerPort, string defaultKey)
+        public static Connection Establish(string defaultKey, string broker, int brokerPort, bool secure = true)
         {
             // Create the connection
-            var conn = new Connection(brokerHostName, brokerPort, defaultKey);
+            var conn = new Connection(defaultKey, broker, brokerPort, secure);
 
             // Connect
             conn.Connect();
@@ -159,9 +182,9 @@ namespace Emitter
             return conn;
         }
 
-        #endregion Static Members
+#endregion Static Members
 
-        #region Connect / Disconnect Members
+#region Connect / Disconnect Members
 
         /// <summary>
         /// Occurs when the client was disconnected.
@@ -184,8 +207,7 @@ namespace Emitter
         private void OnDisconnect(object sender, EventArgs e)
         {
             // Forward the event
-            if (this.Disconnected != null)
-                this.Disconnected(sender, e);
+            this.Disconnected?.Invoke(sender, e);
         }
 
         /// <summary>
@@ -204,215 +226,7 @@ namespace Emitter
             this.Client.Disconnect();
         }
 
-        #endregion Connect / Disconnect Members
-
-        #region Subscribe / Unsubscribe Members
-
-        /// <summary>
-        /// Asynchronously subscribes to a particular channel of emitter.io service. Uses the default
-        /// key that should be specified in the constructor.
-        /// </summary>
-        /// <param name="channel">The channel to subscribe to.</param>
-        /// <param name="handler">The callback to be invoked every time the message is received.</param>
-        /// <returns>The message identifier for this operation.</returns>
-        public ushort On(string channel, MessageHandler handler)
-        {
-            if (this.DefaultKey == null)
-                throw EmitterException.NoDefaultKey;
-            return this.On(this.DefaultKey, channel, handler);
-        }
-
-        /// <summary>
-        /// Asynchronously subscribes to a particular channel of emitter.io service.
-        /// </summary>
-        /// <param name="key">The key to use for this subscription request.</param>
-        /// <param name="channel">The channel to subscribe to.</param>
-        /// <param name="handler">The callback to be invoked every time the message is received.</param>
-        /// <returns>The message identifier for this operation.</returns>
-        public ushort On(string key, string channel, MessageHandler handler)
-        {
-            // Register the handler
-            this.Trie.RegisterHandler(channel, handler);
-
-            // Subscribe
-            return this.Client.Subscribe(new string[] { FormatChannel(key, channel) }, new byte[] { MqttMsgBase.QOS_LEVEL_AT_MOST_ONCE });
-        }
-
-        /// <summary>
-        /// Asynchronously subscribes to a particular channel of emitter.io service.
-        /// </summary>
-        /// <param name="key">The key to use for this subscription request.</param>
-        /// <param name="channel">The channel to subscribe to.</param>
-        /// <param name="handler">The callback to be invoked every time the message is received.</param>
-        /// <param name="last">The last x messages to request when we subcribe.</param>
-        /// <returns>The message identifier for this operation.</returns>
-        public ushort On(string key, string channel, MessageHandler handler, int last)
-        {
-            // Register the handler
-            this.Trie.RegisterHandler(channel, handler);
-
-            // Subscribe
-            return this.Client.Subscribe(new string[] { FormatChannel(key, channel, new Option("last", last.ToString())) }, new byte[] { MqttMsgBase.QOS_LEVEL_AT_MOST_ONCE });
-        }
-
-        /// <summary>
-        /// Asynchonously unsubscribes from a particular channel of emitter.io service. Uses the default
-        /// key that should be specified in the constructor.
-        /// </summary>
-        /// <param name="channel">The channel to subscribe to.</param>
-        /// <returns>The message identifier for this operation.</returns>
-        public ushort Unsubscribe(string channel)
-        {
-            if (this.DefaultKey == null)
-                throw EmitterException.NoDefaultKey;
-            return this.Unsubscribe(this.DefaultKey, channel);
-        }
-
-        /// <summary>
-        /// Asynchonously unsubscribes from a particular channel of emitter.io service.
-        /// </summary>
-        /// <param name="key">The key to use for this unsubscription request.</param>
-        /// <param name="channel">The channel to subscribe to.</param>
-        /// <returns>The message identifier for this operation.</returns>
-        public ushort Unsubscribe(string key, string channel)
-        {
-            // Unregister the handler
-            this.Trie.UnregisterHandler(key);
-
-            // Unsubscribe
-            return this.Client.Unsubscribe(new string[] { FormatChannel(key, channel) });
-        }
-
-        #endregion Subscribe / Unsubscribe Members
-
-        #region Publish Members
-
-        /// <summary>
-        /// Asynchonously publishes a message to the emitter.io service. Uses the default
-        /// key that should be specified in the constructor.
-        /// </summary>
-        /// <param name="channel">The channel to publish to.</param>
-        /// <param name="message">The message body to send.</param>
-        /// <returns>The message identifier for this operation.</returns>
-        public ushort Publish(string channel, byte[] message)
-        {
-            if (this.DefaultKey == null)
-                throw EmitterException.NoDefaultKey;
-            return this.Publish(this.DefaultKey, channel, message);
-        }
-
-        /// <summary>
-        /// Asynchonously publishes a message to the emitter.io service. Uses the default
-        /// key that should be specified in the constructor.
-        /// </summary>
-        /// <param name="channel">The channel to publish to.</param>
-        /// <param name="message">The message body to send.</param>
-        /// <returns>The message identifier for this operation.</returns>
-        public ushort Publish(string channel, string message)
-        {
-            if (this.DefaultKey == null)
-                throw EmitterException.NoDefaultKey;
-            return this.Publish(this.DefaultKey, channel, Encoding.UTF8.GetBytes(message));
-        }
-
-        /// <summary>
-        /// Publishes a message to the emitter.io service asynchronously.
-        /// </summary>
-        /// <param name="key">The key to use for this publish request.</param>
-        /// <param name="channel">The channel to publish to.</param>
-        /// <param name="message">The message body to send.</param>
-        /// <returns>The message identifier.</returns>
-        public ushort Publish(string key, string channel, string message)
-        {
-            return this.Client.Publish(FormatChannel(key, channel), Encoding.UTF8.GetBytes(message));
-        }
-
-        /// <summary>
-        /// Publishes a message to the emitter.io service asynchronously.
-        /// </summary>
-        /// <param name="key">The key to use for this publish request.</param>
-        /// <param name="channel">The channel to publish to.</param>
-        /// <param name="message">The message body to send.</param>
-        /// <returns>The message identifier.</returns>
-        public ushort Publish(string key, string channel, byte[] message)
-        {
-            return this.Client.Publish(FormatChannel(key, channel), message);
-        }
-
-        /// <summary>
-        /// Publishes a message to the emitter.io service asynchronously.
-        /// </summary>
-        /// <param name="key">The key to use for this publish request.</param>
-        /// <param name="channel">The channel to publish to.</param>
-        /// <param name="message">The message body to send.</param>
-        /// <param name="ttl">The time to live of the message.</param>
-        /// <returns>The message identifier.</returns>
-        public ushort Publish(string key, string channel, string message, int ttl)
-        {
-            return this.Client.Publish(FormatChannel(key, channel, new Option("ttl", ttl.ToString())), Encoding.UTF8.GetBytes(message));
-        }
-
-        /// <summary>
-        /// Publishes a message to the emitter.io service asynchronously.
-        /// </summary>
-        /// <param name="key">The key to use for this publish request.</param>
-        /// <param name="channel">The channel to publish to.</param>
-        /// <param name="message">The message body to send.</param>
-        /// <param name="ttl">The time to live of the message.</param>
-        /// <returns>The message identifier.</returns>
-        public ushort Publish(string key, string channel, byte[] message, int ttl)
-        {
-            return this.Client.Publish(FormatChannel(key, channel, new Option("ttl", ttl.ToString())), message);
-        }
-
-        #endregion Publish Members
-
-        #region KeyGen Members
-
-        /// <summary>
-        /// Hashtable used for processing keygen responses.
-        /// </summary>
-        private readonly Hashtable KeygenHandlers = new Hashtable();
-
-        /// <summary>
-        /// Asynchronously sends a key generation request to the emitter.io service.
-        /// </summary>
-        /// <param name="secretKey">The secret key for this request.</param>
-        /// <param name="channel">The target channel for the requested key.</param>
-        /// <param name="securityAccess">The security access of the requested key.</param>
-        public void GenerateKey(string secretKey, string channel, SecurityAccess securityAccess, KeygenHandler handler)
-        {
-            this.GenerateKey(secretKey, channel, securityAccess, 0, handler);
-        }
-
-        /// <summary>
-        /// Asynchronously sends a key generation request to the emitter.io service.
-        /// </summary>
-        /// <param name="secretKey">The secret key for this request.</param>
-        /// <param name="channel">The target channel for the requested key.</param>
-        /// <param name="securityAccess">The security access of the requested key.</param>
-        /// <param name="ttl">The number of seconds for which this key will be usable.</param>
-        public void GenerateKey(string secretKey, string channel, SecurityAccess securityAccess, int ttl, KeygenHandler handler)
-        {
-            // Prepare the request
-            var request = new KeygenRequest();
-            request.Key = secretKey;
-            request.Channel = channel;
-            request.Type = securityAccess;
-            request.Ttl = ttl;
-
-            // Register the handler
-            this.KeygenHandlers[channel] = handler;
-
-            //this.Client.Subscribe(new string[] { "emitter/keygen/" }, new byte[] { 0 });
-
-            // Serialize and publish the request
-            this.Publish("emitter/", "keygen/", Encoding.UTF8.GetBytes(request.ToJson()));
-        }
-
-        #endregion KeyGen Members
-
-        #region Private Members
+#endregion Connect / Disconnect Members
 
         /// <summary>
         /// Occurs when a message is received.
@@ -423,6 +237,18 @@ namespace Emitter
         {
             try
             {
+                if (!e.Topic.StartsWith("emitter"))
+                {
+                    var handlers = this.Trie.Match(e.Topic);
+                    // Invoke every handler matching the channel
+                    foreach (MessageHandler handler in handlers)
+                        handler(e.Topic, e.Message);
+
+                    if (handlers.Count == 0)
+                        DefaultMessageHandler?.Invoke(e.Topic, e.Message);
+                    return;
+                }
+
                 // Did we receive a keygen response?
                 if (e.Topic == "emitter/keygen/")
                 {
@@ -435,8 +261,41 @@ namespace Emitter
                     }
 
                     // Call the response handler we have registered previously
+                    // TODO: get rid of the handler afterwards, or refac keygen
                     if (this.KeygenHandlers.ContainsKey(response.Channel))
                         ((KeygenHandler)this.KeygenHandlers[response.Channel])(response);
+                    return;
+                }
+
+                if (e.Topic == "emitter/presence/")
+                {
+                    var presenceEvent = PresenceEvent.FromBinary(e.Message);
+                    
+                    var handlers = this.PresenceTrie.Match(presenceEvent.Channel);
+                    // Invoke every handler matching the channel
+                    foreach (PresenceHandler handler in handlers)
+                        handler(presenceEvent);
+
+                    if (handlers.Count == 0)
+                        DefaultPresenceHandler?.Invoke(presenceEvent);
+
+                    return;
+                }
+
+                if (e.Topic == "emitter/error/")
+                {
+                    var errorEvent = ErrorEvent.FromBinary(e.Message);
+                    var emitterException = new EmitterException((EmitterEventCode)errorEvent.Status, errorEvent.Message);
+
+                    InvokeError(emitterException);
+                    return;
+                }
+
+                if (e.Topic == "emitter/me/")
+                {
+                    var meResponse = MeResponse.FromBinary(e.Message);
+                    Me?.Invoke(meResponse);
+       
                     return;
                 }
             }
@@ -444,10 +303,27 @@ namespace Emitter
             {
                 this.InvokeError(ex);
             }
+        }
+#region Private Members
 
-            // Invoke every handler matching the channel
-            foreach (MessageHandler handler in this.Trie.Match(e.Topic))
-                handler(e.Topic, e.Message);
+        private string FormatOptions(string[] options)
+        {
+            string formatted = "";
+            if (options != null && options.Length > 0)
+            {
+                formatted += "?";
+                for (int i = 0; i < options.Length; ++i)
+                {
+                    if (options[i][0] == '+')
+                        continue;
+
+                    formatted += options[i];
+                    if (i + 1 < options.Length)
+                        formatted += "&";
+                }
+            }
+
+            return formatted;
         }
 
         /// <summary>
@@ -457,36 +333,59 @@ namespace Emitter
         /// <param name="channel">The channel name.</param>
         /// <param name="options">The options.</param>
         /// <returns></returns>
-        private string FormatChannel(string key, string channel, params Option[] options)
+        private string FormatChannel(string key, string channel, params string[] options)
         {
-            // Prefix with the key
-            var formatted = key.EndsWith("/")
-                ? key + channel
-                : key + "/" + channel;
+            string k = key.Trim('/');
+            string c = channel.Trim('/');
+            string o = FormatOptions(options);
 
-            // Add trailing slash
-            if (!formatted.EndsWith("/"))
-                formatted += "/";
+            var formatted = string.Format("{0}/{1}/{2}", k, c, o);
 
-            // Add options
-            if (options != null && options.Length > 0)
-            {
-                formatted += "?";
-                for (int i = 0; i < options.Length; ++i)
-                {
-                    formatted += options[i].Key + "=" + options[i].Value;
-                    if (i + 1 < options.Length)
-                        formatted += "&";
-                }
-            }
-
-            // We're done compiling the channel name
             return formatted;
         }
 
-        #endregion Private Members
+        private string FormatChannelLink(string channel, params string[] options)
+        {
+            string c = channel.Trim('/');
+            string o = FormatOptions(options);
 
-        #region IDisposable
+            var formatted = string.Format("{0}/{1}", c, o);
+
+            return formatted;
+        }
+
+        private string FormatChannelShare(string key, string channel, string shareGroup, params string[] options)
+        {
+            string k = key.Trim('/');
+            string c = channel.Trim('/');
+            string s = shareGroup.Trim('/');
+            string o = FormatOptions(options);
+
+            var formatted = string.Format("{0}/$share/{1}/{2}/{3}", k, s, c, o);
+
+            return formatted;
+        }
+
+        private void GetHeader(string[] options, out bool retain, out byte qos)
+        {
+            retain = false;
+            qos = 0;
+            foreach (string o in options)
+            {
+                switch (o)
+                {
+                    case Options.Retain:
+                        retain = true;
+                        break;
+                    case Options.QoS1:
+                        qos = 1;
+                        break;
+                }
+            }
+        }
+#endregion Private Members
+
+#region IDisposable
 
         /// <summary>
         /// Disposes the connection.
@@ -518,160 +417,6 @@ namespace Emitter
             this.Dispose(false);
         }
 
-        #endregion IDisposable
+#endregion IDisposable
     }
-
-    #region ReverseTrie
-
-    /// <summary>
-    /// Represents a trie with a reverse-pattern search.
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    internal class ReverseTrie
-    {
-        private readonly Hashtable Children;
-        private readonly short Level = 0;
-        private MessageHandler Value = default(MessageHandler);
-
-        /// <summary>
-        /// Constructs a node of the trie.
-        /// </summary>
-        /// <param name="level">The level of this node within the trie.</param>
-        public ReverseTrie(short level)
-        {
-            this.Level = level;
-            this.Children = new Hashtable();
-        }
-
-        /// <summary>
-        /// Adds a new handler for the channel.
-        /// </summary>
-        /// <param name="channel"></param>
-        /// <param name="value"></param>
-        public void RegisterHandler(string channel, MessageHandler value)
-        {
-            // Add the value or replace it.
-            this.AddOrUpdate(CreateKey(channel), 0, () => value, (old) => value);
-        }
-
-        /// <summary>
-        /// Unregister the handler from the trie.
-        /// </summary>
-        /// <param name="channel"></param>
-        public void UnregisterHandler(string channel)
-        {
-            MessageHandler removed;
-            this.TryRemove(CreateKey(channel), 0, out removed);
-        }
-
-        /// <summary>
-        /// Retrieves a set of values.
-        /// </summary>
-        /// <param name="query">The query to retrieve.</param>
-        /// <param name="position">The position.</param>
-        /// <returns></returns>
-        public IEnumerable Match(string channel)
-        {
-            // Matches
-            var result = new ArrayList();
-
-            // Get the query
-            var query = CreateKey(channel);
-
-            // Get the matching stack
-            var matches = new Stack();
-
-            // Push the root
-            object childNode;
-            matches.Push(this);
-            while (matches.Count != 0)
-            {
-                var current = matches.Pop() as ReverseTrie;
-                if (current.Value != default(object))
-                    result.Add(current.Value);
-
-                var level = current.Level + 1;
-                if (level >= query.Length)
-                    break;
-
-                if (Utils.TryGetValueFromHashtable(current.Children, "+", out childNode))
-                    matches.Push(childNode);
-                if (Utils.TryGetValueFromHashtable(current.Children, query[level], out childNode))
-                    matches.Push(childNode);
-            }
-
-            return result;
-        }
-
-        #region Private Members
-
-        /// <summary>
-        /// Creates a query for the trie from the channel name.
-        /// </summary>
-        /// <param name="channel"></param>
-        /// <returns></returns>
-        public static string[] CreateKey(string channel)
-        {
-            return channel.Split('/');
-        }
-
-        /// <summary>
-        /// Adds or updates a specific value.
-        /// </summary>
-        /// <param name="key"></param>
-        /// <param name="position"></param>
-        /// <returns></returns>
-        private object AddOrUpdate(string[] key, int position, AddFunc addFunc, UpdateFunc updateFunc)
-        {
-            if (position >= key.Length)
-            {
-                lock (this)
-                {
-                    // There's already a value
-                    if (this.Value != default(object))
-                        return updateFunc(this.Value);
-
-                    // No value, add it
-                    this.Value = addFunc();
-                    return this.Value;
-                }
-            }
-
-            // Create a child
-            var child = Utils.GetOrAddToHashtable(Children, key[position], new ReverseTrie((short)position)) as ReverseTrie;
-            return child.AddOrUpdate(key, position + 1, addFunc, updateFunc);
-        }
-
-        /// <summary>
-        /// Attempts to remove a specific key from the Trie.
-        /// </summary>
-        private bool TryRemove(string[] key, int position, out MessageHandler value)
-        {
-            if (position >= key.Length)
-            {
-                lock (this)
-                {
-                    // There's no value
-                    value = this.Value;
-                    if (this.Value == default(MessageHandler))
-                        return false;
-
-                    this.Value = default(MessageHandler);
-                    return true;
-                }
-            }
-
-            // Remove from the child
-            object child;
-            if (Utils.TryGetValueFromHashtable(Children, key[position], out child))
-                return ((ReverseTrie)child).TryRemove(key, position + 1, out value);
-
-            value = default(MessageHandler);
-            return false;
-        }
-
-        #endregion Private Members
-    }
-
-    #endregion ReverseTrie
 }

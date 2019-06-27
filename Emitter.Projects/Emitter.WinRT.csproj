@@ -41,6 +41,24 @@
     <TargetPlatform Include="Windows, Version=8.1" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Emitter\Emitter.KeyGen.cs">
+      <Link>Emitter.KeyGen.cs</Link>
+    </Compile>
+    <Compile Include="..\Emitter\Emitter.Link.cs">
+      <Link>Emitter.Link.cs</Link>
+    </Compile>
+    <Compile Include="..\Emitter\Emitter.Me.cs">
+      <Link>Emitter.Me.cs</Link>
+    </Compile>
+    <Compile Include="..\Emitter\Emitter.Presence.cs">
+      <Link>Emitter.Presence.cs</Link>
+    </Compile>
+    <Compile Include="..\Emitter\Emitter.Publish.cs">
+      <Link>Emitter.Publish.cs</Link>
+    </Compile>
+    <Compile Include="..\Emitter\Emitter.Subscribe.cs">
+      <Link>Emitter.Subscribe.cs</Link>
+    </Compile>
     <Compile Include="..\Emitter\Exceptions\MqttClientException.cs" />
     <Compile Include="..\Emitter\Exceptions\EmitterException.cs" />
     <Compile Include="..\Emitter\Exceptions\MqttConnectionException.cs" />
@@ -49,8 +67,17 @@
     <Compile Include="..\Emitter\Internal\InternalEvent.cs" />
     <Compile Include="..\Emitter\Internal\MsgInternalEvent.cs" />
     <Compile Include="..\Emitter\Internal\MsgPublishedInternalEvent.cs" />
+    <Compile Include="..\Emitter\Messages\ErrorEvent.cs">
+      <Link>ErrorEvent.cs</Link>
+    </Compile>
     <Compile Include="..\Emitter\Messages\KeygenResponse.cs" />
     <Compile Include="..\Emitter\Messages\KeygenRequest.cs" />
+    <Compile Include="..\Emitter\Messages\LinkRequest.cs">
+      <Link>LinkRequest.cs</Link>
+    </Compile>
+    <Compile Include="..\Emitter\Messages\MeResponse.cs">
+      <Link>MeResponse.cs</Link>
+    </Compile>
     <Compile Include="..\Emitter\Messages\MqttMsgBase.cs" />
     <Compile Include="..\Emitter\Messages\MqttMsgConnack.cs" />
     <Compile Include="..\Emitter\Messages\MqttMsgConnect.cs" />
@@ -76,6 +103,12 @@
     <Compile Include="..\Emitter\Messages\MqttMsgUnsubscribeEventArgs.cs" />
     <Compile Include="..\Emitter\Json\JsonParser.cs" />
     <Compile Include="..\Emitter\Json\JsonSerializer.cs" />
+    <Compile Include="..\Emitter\Messages\PresenceEvent.cs">
+      <Link>PresenceEvent.cs</Link>
+    </Compile>
+    <Compile Include="..\Emitter\Messages\PresenceRequest.cs">
+      <Link>PresenceRequest.cs</Link>
+    </Compile>
     <Compile Include="..\Emitter\MqttClient.cs" />
     <Compile Include="..\Emitter\MqttSecurity.cs" />
     <Compile Include="..\Emitter\MqttSettings.cs" />
@@ -84,6 +117,12 @@
     <Compile Include="..\Emitter\Session\MqttClientSession.cs" />
     <Compile Include="..\Emitter\Session\MqttSession.cs" />
     <Compile Include="..\Emitter\Utility\Extensions.cs" />
+    <Compile Include="..\Emitter\Utility\Options.cs">
+      <Link>Options.cs</Link>
+    </Compile>
+    <Compile Include="..\Emitter\Utility\ReverseTrie.cs">
+      <Link>ReverseTrie.cs</Link>
+    </Compile>
     <Compile Include="..\Emitter\Utility\Trace.cs" />
     <Compile Include="..\Emitter\WinRT\Fx.cs" />
     <Compile Include="..\Emitter\WinRT\MqttNetworkChannel.cs" />
