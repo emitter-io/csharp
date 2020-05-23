@@ -23,11 +23,6 @@ namespace Emitter.Messages
         public string Name;
 
         /// <summary>
-        /// Gets or sets whether the link is private.
-        /// </summary>
-        public bool Private;
-
-        /// <summary>
         /// Gets or sets whether to subscribe automatically upon the creation of the link.
         /// </summary>
         public bool Subscribe;
@@ -43,7 +38,6 @@ namespace Emitter.Messages
                 {"key", this.Key},
                 {"channel", this.Channel},
                 {"name", this.Name},
-                {"private", this.Private},
                 {"subscribe", this.Subscribe }
             });
         }

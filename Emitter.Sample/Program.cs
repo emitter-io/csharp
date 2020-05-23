@@ -12,10 +12,10 @@ namespace Emitter.Sample
     {
         static void Main(string[] args)
         {
-            var channelKey = "8jMLP9F859oDyqmJ3aV4aqnmFZpxApvb"; // Insert your own key here.
+            var channelKey = "a9R37L2dnGVJU7JQMsdbLEYpaeWnrZ0v"; // Insert your own key here.
             var channel = "test/";
 
-            using (var emitter = Connection.Establish(channelKey, "api.emitter.io"))
+            using (var emitter = Connection.Establish(channelKey, "127.0.0.1", 8080, false))
             {
                 emitter.Error += (object sender, Exception e) => { Console.WriteLine("Error:" + e.Message); };
                 emitter.PresenceSubscribe(channelKey, channel, false, (PresenceEvent e) => { Console.WriteLine("Presence event " + e.Event + "."); });
@@ -28,8 +28,7 @@ namespace Emitter.Sample
                     Options.WithUntil(DateTime.UtcNow),
                     Options.WithLast(10_000));
 
-                emitter.Link(channelKey, channel, "L0", false, true);
-                emitter.Link(channelKey, channel, "L1", false, true);
+                emitter.Link(channelKey, channel, "L0", true);
                 emitter.PublishWithLink("L0", "Link test");
 
                 emitter.Me += (MeResponse me) => { Console.WriteLine(me.MyId); };
