@@ -140,42 +140,53 @@ namespace Emitter
         /// <summary>
         /// Establishes a new connection by creating the connection instance and connecting to it.
         /// </summary>
-        /// <returns>The connection state.</returns>
-        public static Connection Establish()
-        {
-            return Establish(null, null, 0, true);
-        }
-
-        /// <summary>
-        /// Establishes a new connection by creating the connection instance and connecting to it.
-        /// </summary>
-        /// <param name="defaultKey">The default key to use.</param>
-        /// <returns>The connection state.</returns>
-        public static Connection Establish(string defaultKey)
-        {
-            return Establish(defaultKey, null, 0, true);
-        }
-
-        public static Connection Establish(string defaultKey, string broker, bool secure = true)
-        {
-            return Establish(defaultKey, broker, 0, secure);
-        }
-
-        /// <summary>
-        /// Establishes a new connection by creating the connection instance and connecting to it.
-        /// </summary>
-        /// <param name="brokerHostName">The broker hostname to use.</param>
-        /// <param name="defaultKey">The default key to use.</param>
-        /// <returns>The connection state.</returns>
         /// <param name="username">Optional username to use for the connection.</param>
-        /// <param name="password">Optional password to use for the connection.</param>
-        public static Connection Establish(string defaultKey, string broker, int brokerPort, bool secure = true, string username = null, string password = null)
+        /// <returns>The connection state.</returns>
+        public static Connection Establish(string username = null)
+        {
+            return Establish(null, null, 0, true, username);
+        }
+
+        /// <summary>
+        /// Establishes a new connection by creating the connection instance and connecting to it.
+        /// </summary>
+        /// <param name="defaultKey">The default key to use.</param>
+        /// <param name="username">Optional username to use for the connection.</param>
+        /// <returns>The connection state.</returns>
+        public static Connection Establish(string defaultKey, string username = null)
+        {
+            return Establish(defaultKey, null, 0, true, username);
+        }
+
+        /// <summary>
+        /// Establishes a new connection by creating the connection instance and connecting to it.
+        /// </summary>
+        /// <param name="defaultKey">The default key to use.</param>
+        /// <param name="broker">The broker hostname to use.</param>
+        /// <param name="secure">Whether its a secure connection.</param>
+        /// <param name="username">Optional username to use for the connection.</param>
+        /// <returns>The connection state.</returns>
+        public static Connection Establish(string defaultKey, string broker, bool secure = true, string username = null)
+        {
+            return Establish(defaultKey, broker, 0, secure, username);
+        }
+
+        /// <summary>
+        /// Establishes a new connection by creating the connection instance and connecting to it.
+        /// </summary>
+        /// <param name="broker">The broker hostname to use.</param>
+        /// <param name="brokerPort">The broker port to use.</param>
+        /// <param name="secure">Whether its a secure connection.</param>
+        /// <param name="defaultKey">The default key to use.</param>
+        /// <param name="username">Optional username to use for the connection.</param>
+        /// <returns>The connection state.</returns>
+        public static Connection Establish(string defaultKey, string broker, int brokerPort, bool secure = true, string username = null)
         {
             // Create the connection
             var conn = new Connection(defaultKey, broker, brokerPort, secure);
 
             // Connect
-            conn.Connect(username, password);
+            conn.Connect(username);
 
             // Return it
             return conn;
@@ -212,9 +223,9 @@ namespace Emitter
         /// <summary>
         /// Connects the emitter.io service.
         /// </summary>
-        public void Connect(string username = null, string password = null)
+        public void Connect(string username = null)
         {
-            var connack = this.Client.Connect(Guid.NewGuid().ToString(), username, password);
+            var connack = this.Client.Connect(Guid.NewGuid().ToString(), username, null);
         }
 
         /// <summary>
