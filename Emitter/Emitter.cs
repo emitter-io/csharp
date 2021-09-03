@@ -12,14 +12,11 @@ Contributors:
    Roman Atachiants - integrating with emitter.io
 */
 
-using System;
-using System.Collections;
-using System.Collections.Concurrent;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using Emitter.Messages;
 using Emitter.Utility;
+using System;
+using System.Collections.Concurrent;
+using System.Threading.Tasks;
 
 #if (MF_FRAMEWORK_VERSION_V4_2 || MF_FRAMEWORK_VERSION_V4_3)
 
@@ -94,11 +91,11 @@ namespace Emitter
 
             this.DefaultKey = defaultKey;
             if (secure)
-                #if !(WINDOWS_APP || WINDOWS_PHONE_APP)
+#if !(WINDOWS_APP || WINDOWS_PHONE_APP)
                 this.Client = new MqttClient(broker, brokerPort, true, MqttSslProtocols.TLSv1_0, null, null);
-                #else
+#else
                 this.Client = new MqttClient(broker, brokerPort, true, MqttSslProtocols.TLSv1_0);
-                #endif
+#endif
             else
                 this.Client = new MqttClient(broker, brokerPort);
 
@@ -106,7 +103,7 @@ namespace Emitter
             this.Client.ConnectionClosed += OnDisconnect;
         }
 
-#endregion Constructors
+        #endregion Constructors
 
         #region Error Members
 
@@ -143,48 +140,61 @@ namespace Emitter
         /// <summary>
         /// Establishes a new connection by creating the connection instance and connecting to it.
         /// </summary>
+        /// <param name="username">Optional username to use for the connection.</param>
         /// <returns>The connection state.</returns>
-        public static Connection Establish()
+        public static Connection Establish(string username = null)
         {
-            return Establish(null, null, 0, true);
+            return Establish(null, null, 0, true, username);
         }
 
         /// <summary>
         /// Establishes a new connection by creating the connection instance and connecting to it.
         /// </summary>
         /// <param name="defaultKey">The default key to use.</param>
+        /// <param name="username">Optional username to use for the connection.</param>
         /// <returns>The connection state.</returns>
-        public static Connection Establish(string defaultKey)
+        public static Connection Establish(string defaultKey, string username = null)
         {
-            return Establish(defaultKey, null, 0, true);
-        }
-
-        public static Connection Establish(string defaultKey, string broker, bool secure = true)
-        {
-            return Establish(defaultKey, broker, 0, secure);
+            return Establish(defaultKey, null, 0, true, username);
         }
 
         /// <summary>
         /// Establishes a new connection by creating the connection instance and connecting to it.
         /// </summary>
-        /// <param name="brokerHostName">The broker hostname to use.</param>
         /// <param name="defaultKey">The default key to use.</param>
+        /// <param name="broker">The broker hostname to use.</param>
+        /// <param name="secure">Whether its a secure connection.</param>
+        /// <param name="username">Optional username to use for the connection.</param>
         /// <returns>The connection state.</returns>
-        public static Connection Establish(string defaultKey, string broker, int brokerPort, bool secure = true)
+        public static Connection Establish(string defaultKey, string broker, bool secure = true, string username = null)
+        {
+            return Establish(defaultKey, broker, 0, secure, username);
+        }
+
+        /// <summary>
+        /// Establishes a new connection by creating the connection instance and connecting to it.
+        /// </summary>
+        /// <param name="broker">The broker hostname to use.</param>
+        /// <param name="brokerPort">The broker port to use.</param>
+        /// <param name="secure">Whether its a secure connection.</param>
+        /// <param name="defaultKey">The default key to use.</param>
+        /// <param name="username">Optional username to use for the connection.</param>
+        /// <returns>The connection state.</returns>
+        public static Connection Establish(string defaultKey, string broker, int brokerPort, bool secure = true, string username = null)
         {
             // Create the connection
             var conn = new Connection(defaultKey, broker, brokerPort, secure);
 
             // Connect
-            conn.Connect();
+            conn.Connect(username);
 
             // Return it
             return conn;
         }
 
-#endregion Static Members
+        #endregion Static Members
 
-#region Connect / Disconnect Members
+        #region Connect / Disconnect Members
 
         /// <summary>
         /// Occurs when the client was disconnected.
@@ -213,9 +223,9 @@ namespace Emitter
         /// <summary>
         /// Connects the emitter.io service.
         /// </summary>
-        public void Connect()
+        public void Connect(string username = null)
         {
-            var connack = this.Client.Connect(Guid.NewGuid().ToString());
+            var connack = this.Client.Connect(Guid.NewGuid().ToString(), username, null);
         }
 
         /// <summary>
@@ -226,7 +236,7 @@ namespace Emitter
             this.Client.Disconnect();
         }
 
-#endregion Connect / Disconnect Members
+        #endregion Connect / Disconnect Members
 
         /// <summary>
         /// Occurs when a message is received.
@@ -270,7 +280,7 @@ namespace Emitter
                 if (e.Topic == "emitter/presence/")
                 {
                     var presenceEvent = PresenceEvent.FromBinary(e.Message);
-                    
+
                     var handlers = this.PresenceTrie.Match(presenceEvent.Channel);
                     // Invoke every handler matching the channel
                     foreach (PresenceHandler handler in handlers)
@@ -295,7 +305,7 @@ namespace Emitter
                 {
                     var meResponse = MeResponse.FromBinary(e.Message);
                     Me?.Invoke(meResponse);
-       
+
                     return;
                 }
             }
@@ -304,7 +314,7 @@ namespace Emitter
                 this.InvokeError(ex);
             }
         }
-#region Private Members
+        #region Private Members
 
         private string FormatOptions(string[] options)
         {
@@ -383,9 +393,9 @@ namespace Emitter
                 }
             }
         }
-#endregion Private Members
+        #endregion Private Members
 
-#region IDisposable
+        #region IDisposable
 
         /// <summary>
         /// Disposes the connection.
@@ -417,6 +427,6 @@ namespace Emitter
             this.Dispose(false);
         }
 
-#endregion IDisposable
+        #endregion IDisposable
     }
 }

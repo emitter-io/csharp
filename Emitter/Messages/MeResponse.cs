@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 
@@ -26,8 +25,9 @@ namespace Emitter.Messages
             if (map.ContainsKey("req")) response.RequestId = (long)map["req"];
             response.MyId = (string)map["id"];
             response.Links = new List<ShortcutInfo>();
-            
-            if (map["links"] is Hashtable links)
+
+            if (map.ContainsKey("links") &&
+                map["links"] is Hashtable links)
             {
                 foreach (var key in links.Keys)
                 {
